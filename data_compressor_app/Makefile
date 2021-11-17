@@ -123,32 +123,32 @@ data-compressor-app/fast:
 	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/build
 .PHONY : data-compressor-app/fast
 
-src/main.o: src/main.cpp.o
+src/time_object.o: src/time_object.cpp.o
 
-.PHONY : src/main.o
+.PHONY : src/time_object.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/time_object.cpp.o:
+	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/time_object.cpp.o
+.PHONY : src/time_object.cpp.o
 
-src/main.i: src/main.cpp.i
+src/time_object.i: src/time_object.cpp.i
 
-.PHONY : src/main.i
+.PHONY : src/time_object.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/time_object.cpp.i:
+	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/time_object.cpp.i
+.PHONY : src/time_object.cpp.i
 
-src/main.s: src/main.cpp.s
+src/time_object.s: src/time_object.cpp.s
 
-.PHONY : src/main.s
+.PHONY : src/time_object.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/time_object.cpp.s:
+	$(MAKE) -f CMakeFiles/data-compressor-app.dir/build.make CMakeFiles/data-compressor-app.dir/src/time_object.cpp.s
+.PHONY : src/time_object.cpp.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... data-compressor-app"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... src/time_object.o"
+	@echo "... src/time_object.i"
+	@echo "... src/time_object.s"
 .PHONY : help
 
 
