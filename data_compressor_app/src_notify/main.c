@@ -32,7 +32,7 @@ static int setup_security_object(anjay_t *anjay) {
 
     const anjay_security_instance_t security_instance = {
         .ssid = 1,
-        .server_uri = "coap://localhost:5683",
+        .server_uri = "coap://192.168.31.177:5683",
         .security_mode = ANJAY_SECURITY_NOSEC
     };
 
