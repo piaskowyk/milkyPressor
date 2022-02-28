@@ -1,7 +1,8 @@
 from src.data_compressor.compressor import Compressor
 from src.data_type import Measurement
 
-# based on
+# custom 
+# uniform, fixed x interval
 # PAA - Piecewise Polynomial Approximation
 # kais_2000.pdf https://jmotif.github.io/sax-vsm_site/morea/algorithm/PAA.html
 # modification - the better approach for data with variable interval

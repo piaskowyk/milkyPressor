@@ -1,9 +1,10 @@
 from src.data_compressor.compressor import Compressor
 from src.data_type import Measurement
 
+# uniform, fixed points count
 # PAA - Piecewise Polynomial Approximation
 # kais_2000.pdf https://jmotif.github.io/sax-vsm_site/morea/algorithm/PAA.html
-class CompressPLR(Compressor):
+class CompressPAA(Compressor):
 
   config = {
     'chunk_count': 10,
