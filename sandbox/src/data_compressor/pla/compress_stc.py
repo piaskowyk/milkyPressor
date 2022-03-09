@@ -13,7 +13,7 @@ class CompressSTC(Compressor):
       return
     if len(self.original_data) < 4:
       self.compressed_data = self.original_data
-    slope_angle_d = self.stc_conf['slope_angle']
+    slope_angle_d = self.config['slope_angle']
 
     output = [self.original_data[0]]
     for i in range(2, len(self.original_data)):
