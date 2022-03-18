@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 from src.metrics import Metric
 from src.data_type import Measurement
+from typing import List
 
 class Compressor:
   metric: Metric = Metric()
-  original_data: list[Measurement] = []
-  compressed_data: list[Measurement] = []
+  original_data: List[Measurement] = []
+  compressed_data: List[Measurement] = []
   config = {}
 
   def compress(self):
@@ -14,7 +15,7 @@ class Compressor:
   def push(self, measurement: Measurement):
     self.original_data.append(measurement)
   
-  def set_data(self, measurements: list[Measurement]):
+  def set_data(self, measurements: List[Measurement]):
     self.original_data = measurements
 
   def clean_data(self):

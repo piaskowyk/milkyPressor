@@ -14,12 +14,12 @@ class CompressAPCAFT(Compressor):
   
   PI = 3.14159265359
 
-  ft_function: Callable[[list[float]], float]  = lambda data: 1
+  ft_function: Callable[[List[float]], float]  = lambda data: 1
 
-  def set_ft_function(self, ft_function: Callable[[list[float]], float]):
+  def set_ft_function(self, ft_function: Callable[[List[float]], float]):
     self.ft_function = ft_function
 
-  def _call_ft_function(self, data: list[float]) -> float:
+  def _call_ft_function(self, data: List[float]) -> float:
     return self.ft_function(data)
   
   def _get_peaks(self, data):

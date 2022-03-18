@@ -1,11 +1,11 @@
 import math
 import matplotlib.pyplot as plt
 import random
-from typing import Callable
+from typing import Callable, List
 
 class SignalGenerator:
-    data: list[float] = []
-    x_list: list[int] = []
+    data: List[float] = []
+    x_list: List[int] = []
     file_name: str = "out.txt"
 
     def __init__(self, x_start: int = 0, x_end: int = 100) -> None:
@@ -15,7 +15,7 @@ class SignalGenerator:
         self.x_list = [x for x in range(x_start, x_end)]
         return self
 
-    def _merge(self, data: list[float]):
+    def _merge(self, data: List[float]):
         new_data = []
         for i in range(len(data)):
             current_data_item = 0
