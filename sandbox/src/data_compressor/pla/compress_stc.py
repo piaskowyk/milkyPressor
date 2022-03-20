@@ -27,7 +27,6 @@ class CompressSTC(Compressor):
       ratio = abs(slope_angel_ab / slope_angel_cb - 1)
       if ratio > slope_angle_d:
         output.append(point_b)
-        output.append(point_c)
 
     if output[len(output) - 1].timestamp != self.original_data[len(self.original_data) - 1].timestamp:
       output.append(self.original_data[len(self.original_data) - 1])
