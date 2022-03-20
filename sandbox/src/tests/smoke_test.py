@@ -1,3 +1,11 @@
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+grandparent = os.path.dirname(parentdir)
+sys.path.append(grandparent)
+
+
 from src.signal_generator import SignalGenerator
 from src.metrics import Metric
 from src.data_type import Measurement
