@@ -5,9 +5,11 @@ from src.data_compressor.compressor import Compressor
 # Pick With Probability
 class CompressPWP(Compressor):
 
-  config = {
-    'probability': 0.5
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'probability': 0.5
+    }
 
   def _get_with_probability(self, probablity: int):
     return random.randint(0, 100) < probablity

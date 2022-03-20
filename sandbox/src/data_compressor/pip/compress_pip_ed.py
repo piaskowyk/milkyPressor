@@ -7,12 +7,12 @@ from .compress_pip import CompressPIP
 # PIP-ED - perceptual interesting points, euqulides distance
 class CompressPIP_ED(Compressor):
 
-  config = {
-    'compress_ration': 0.5
-  }
-  compressor = CompressPIP()
-
   def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'compress_ratio': 0.5
+    }
+    self.compressor = CompressPIP()
     self.compressor.set_metric(self._euqlides_distance)
 
   def _euqlides_distance(self, point_mid: Measurement, point_a: Measurement, point_b: Measurement) -> float:

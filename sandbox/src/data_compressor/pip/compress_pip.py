@@ -7,9 +7,11 @@ from src.data_type import Measurement
 # PIP - perceptual interesting points, euqulides distance
 class CompressPIP(Compressor):
 
-  config = {
-    'compress_ration': 0.5
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'compress_ratio': 0.5
+    }
 
   metric: Callable[[Measurement, Measurement, Measurement], float]  = lambda point_mid, point_a, point_b: 1
 
@@ -21,7 +23,7 @@ class CompressPIP(Compressor):
 
   def compress(self): 
     config = self.config
-    points_count = config['compress_ration'] * len(self.original_data)
+    points_count = config['compress_ratio'] * len(self.original_data)
     last_index = len(self.original_data) - 1
     indexes = [0, last_index]
     heap = []

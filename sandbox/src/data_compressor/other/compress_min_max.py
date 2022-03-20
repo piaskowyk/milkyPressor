@@ -2,11 +2,13 @@ from src.data_compressor.compressor import Compressor
 
 class CompressMinMax(Compressor):
 
-  config = {
-    'points_count': 30,
-    'points_part': 0.5,
-    'use_points_count': False
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'points_count': 30,
+      'points_part': 0.5,
+      'use_points_count': False
+    }
 
   def compress(self):
     if len(self.original_data) == 0:

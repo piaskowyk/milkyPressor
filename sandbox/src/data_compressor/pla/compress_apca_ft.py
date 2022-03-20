@@ -8,13 +8,14 @@ from src.data_compressor.compressor import Compressor
 # OBST2013.pdf
 class CompressAPCAFT(Compressor):
 
-  config = {
-    'compress_ratio': 0.5
-  }
-  
   PI = 3.14159265359
 
-  ft_function: Callable[[List[float]], float]  = lambda data: 1
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'compress_ratio': 0.5
+    }
+    self.ft_function: Callable[[List[float]], float]  = lambda data: 1
 
   def set_ft_function(self, ft_function: Callable[[List[float]], float]):
     self.ft_function = ft_function

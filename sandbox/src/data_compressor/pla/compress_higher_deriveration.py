@@ -2,9 +2,11 @@ from src.data_compressor.compressor import Compressor
 
 class CompressHigherDeriveration(Compressor):
 
-  config = {
-    'deriveration': 0.05
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'deriveration': 0.05
+    }
 
   def compress(self):
     deriveration = self.config['deriveration']

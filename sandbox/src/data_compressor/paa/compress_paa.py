@@ -6,10 +6,12 @@ from src.data_type import Measurement
 # kais_2000.pdf https://jmotif.github.io/sax-vsm_site/morea/algorithm/PAA.html
 class CompressPAA(Compressor):
 
-  config = {
-    'chunk_count': 10,
-    'compress_ratio': 0.5,
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'chunk_count': 10,
+      'compress_ratio': 0.5,
+    }
 
   def compress(self):
     data_size = len(self.original_data)

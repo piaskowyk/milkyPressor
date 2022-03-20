@@ -7,15 +7,14 @@ from .compress_apca_ft import CompressAPCAFT
 # OBST2013.pdf
 class CompressAPCADFT(Compressor):
 
-  config = {
-    'compress_ratio': 0.5
-  }
-  
   PI = 3.14159265359
 
-  compressor = CompressAPCAFT()
-
   def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'compress_ratio': 0.5
+    }
+    self.compressor = CompressAPCAFT()
     self.compressor.set_ft_function(self._ft_function)
      
   def _ft_function(self, data):

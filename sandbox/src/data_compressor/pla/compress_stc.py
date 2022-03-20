@@ -4,9 +4,11 @@ from src.data_compressor.compressor import Compressor
 # 1-s2.0-S1875389212006219-main
 class CompressSTC(Compressor):
 
-  config = {
-    'slope_angle': 0.4
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'slope_angle': 0.4
+    }
 
   def compress(self):
     if len(self.original_data) == 0:

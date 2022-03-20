@@ -4,9 +4,11 @@ from src.data_compressor.compressor import Compressor
 # chapterPLR.pdf pkdd99keogh_pazzani.pdf
 class CompressPLR(Compressor):
 
-  config = {
-    
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      
+    }
 
   def compress(self):
     pass

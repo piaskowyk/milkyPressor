@@ -4,11 +4,11 @@ import random
 from typing import Callable, List
 
 class SignalGenerator:
-    data: List[float] = []
-    x_list: List[int] = []
-    file_name: str = "out.txt"
 
     def __init__(self, x_start: int = 0, x_end: int = 100) -> None:
+        self.data: List[float] = []
+        self.x_list: List[int] = []
+        self.file_name: str = "out.txt"
         self._set_x_list(x_start, x_end)
 
     def _set_x_list(self, x_start: int, x_end: int):

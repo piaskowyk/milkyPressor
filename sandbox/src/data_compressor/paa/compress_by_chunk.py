@@ -3,9 +3,11 @@ from src.data_type import Measurement
 
 class CompressByChunk(Compressor):
 
-  config = {
-    'chunk_size': 5
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'chunk_size': 5
+    }
 
   def compress(self):
     chunk_size = self.config['chunk_size']

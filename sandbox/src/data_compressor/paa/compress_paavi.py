@@ -8,10 +8,12 @@ from src.data_type import Measurement
 # modification - the better approach for data with variable interval
 class CompressPAAVI(Compressor):
 
-  config = {
-    'chunk_count': 10,
-    'compress_ratio': 0.5,
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'chunk_count': 10,
+      'compress_ratio': 0.5,
+    }
 
   def interpolate_value(self, x: int, point_A: Measurement, point_B: Measurement) -> float:
     return ((point_B.value - point_A.value) / (point_B.timestamp - point_A.timestamp)) * x \

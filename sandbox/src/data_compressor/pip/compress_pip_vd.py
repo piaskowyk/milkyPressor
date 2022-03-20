@@ -7,12 +7,12 @@ from .compress_pip import CompressPIP
 # PIP-VD - perceptual interesting points, vertical distance
 class CompressPIP_VD(Compressor):
 
-  config = {
-    'compress_ration': 0.5
-  }
-  compressor = CompressPIP()
-
   def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'compress_ratio': 0.5
+    }
+    self.compressor = CompressPIP()
     self.compressor.set_metric(self._vertical_distance)
 
   def _euqlides_distance(self, point_a: Measurement, point_b: Measurement) -> float:

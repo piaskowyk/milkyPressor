@@ -4,10 +4,13 @@ from src.data_type import Measurement
 from typing import List
 
 class Compressor:
-  metric: Metric = Metric()
-  original_data: List[Measurement] = []
-  compressed_data: List[Measurement] = []
-  config = {}
+
+  def __init__(self) -> None:
+    super().__init__()
+    self.metric: Metric = Metric()
+    self.original_data: List[Measurement] = []
+    self.compressed_data: List[Measurement] = []
+    self.config = {}
 
   def compress(self):
     raise "Unimplement method"

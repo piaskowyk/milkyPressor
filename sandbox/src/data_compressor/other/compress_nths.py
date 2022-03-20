@@ -2,9 +2,11 @@ from src.data_compressor.compressor import Compressor
 
 class CompressNTHS(Compressor):
 
-  config = {
-    'n': 3
-  }
+  def __init__(self) -> None:
+    super().__init__()
+    self.config = {
+      'n': 3
+    }
 
   def compress(self):
     data_len = len(self.original_data)
