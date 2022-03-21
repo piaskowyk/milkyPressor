@@ -1,11 +1,59 @@
+from calendar import c
 import math
+from re import S
 import matplotlib.pyplot as plt
 from typing import Tuple, Any, List
 import numpy as np
 import statistics
+from src.data_type import Measurement
 
 class Metric:
-  def sum_differences(self, original: List[float], transformed: List[float], use_absolut_value: bool = True) -> float:
+
+  def _strip_data(self, data: List[Measurement]):
+    return [item.value for item in data]
+
+  def _interpolate_points(self, x: int, point_A: Measurement, point_B: Measurement) -> float:
+    return ((point_B.value - point_A.value) / (point_B.timestamp - point_A.timestamp)) * x \
+      + ((point_B.timestamp * point_A.value - point_A.timestamp * point_B.value) / (point_B.timestamp - point_A.timestamp))
+
+  def _interpolate_data(self, original: List[Measurement], transformed: List[Measurement]):
+    interpolated = []
+    current_index = 0
+    transformed_count = len(transformed)
+    data_original_count = len(original)
+    if data_original_count < 2:
+      return original
+    first = original[0]
+    if first.timestamp != transformed[0].timestamp:
+      interpolated = [Measurement(first.value, first.timestamp)]
+      current_index = 1
+
+    data_transformed_count = len(transformed)
+    last = original[data_original_count - 1]
+    if last.timestamp != transformed[data_transformed_count - 1].timestamp:
+      transformed.append(Measurement(last.value, last.timestamp))
+
+    for original_measurement in original:
+      for i in range(current_index, transformed_count):
+        if transformed[i].timestamp == original_measurement.timestamp:
+          interpolated.append(Measurement(original_measurement.value, original_measurement.timestamp))
+        elif transformed[i].timestamp < original_measurement.timestamp:
+          break
+        else:
+          current_index = i
+      point_a = transformed[i - 1]
+      point_b = transformed[i]
+      x = original_measurement.timestamp
+      y = self._interpolate_points(x, point_a, point_b)
+      interpolated.append(Measurement(y, x))
+    return interpolated
+
+  def _prepare_data(self, original: List[Measurement], transformed: List[Measurement]):
+    return self._strip_data(self._interpolate_data(original, transformed))
+
+  def sum_differences(self, original: List[Measurement], transformed: List[Measurement], use_absolut_value: bool = True) -> float:
+    original = self._prepare_data(original, transformed)
+    transformed = self._strip_data(transformed)
     differences = [original[i] - transformed[i] for i in range(len(original))]
     if use_absolut_value:
       differences = map(math.fabs, differences)
@@ -257,3 +305,6 @@ class Metric:
     if show_diff:
       return self._corelation_spearman_on_injection(x_list, original) - self._corelation_spearman_on_injection(x_list, transformed)
     return self._corelation_spearman_on_injection(x_list, transformed)
+
+  def compression_ratio(self, original: List[float], transformed: List[float]) -> float:
+    return len(transformed) / len(original)
