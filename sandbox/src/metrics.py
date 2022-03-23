@@ -16,7 +16,7 @@ class Metric:
     return ((point_B.value - point_A.value) / (point_B.timestamp - point_A.timestamp)) * x \
       + ((point_B.timestamp * point_A.value - point_A.timestamp * point_B.value) / (point_B.timestamp - point_A.timestamp))
 
-  def _interpolate_data(self, original: List[Measurement], transformed: List[Measurement]):
+  def _interpolate_data(self, original: List[Measurement], transformed: List[Measurement]) -> List[Measurement]:
     interpolated = []
     current_index = 0
     transformed_count = len(transformed)
@@ -25,8 +25,7 @@ class Metric:
       return original
     first = original[0]
     if first.timestamp != transformed[0].timestamp:
-      interpolated = [Measurement(first.value, first.timestamp)]
-      current_index = 1
+      transformed = [Measurement(first.value, first.timestamp)] + transformed
 
     data_transformed_count = len(transformed)
     last = original[data_original_count - 1]
@@ -37,34 +36,34 @@ class Metric:
       for i in range(current_index, transformed_count):
         if transformed[i].timestamp == original_measurement.timestamp:
           interpolated.append(Measurement(original_measurement.value, original_measurement.timestamp))
-        elif transformed[i].timestamp < original_measurement.timestamp:
           break
-        else:
+        elif transformed[i].timestamp > original_measurement.timestamp:
           current_index = i
-      point_a = transformed[i - 1]
-      point_b = transformed[i]
-      x = original_measurement.timestamp
-      y = self._interpolate_points(x, point_a, point_b)
-      interpolated.append(Measurement(y, x))
+          point_a = transformed[current_index - 1]
+          point_b = transformed[current_index]
+          x = original_measurement.timestamp
+          y = self._interpolate_points(x, point_a, point_b)
+          interpolated.append(Measurement(y, x))
+          break
     return interpolated
 
   def _prepare_data(self, original: List[Measurement], transformed: List[Measurement]):
     return self._strip_data(self._interpolate_data(original, transformed))
 
   def sum_differences(self, original: List[Measurement], transformed: List[Measurement], use_absolut_value: bool = True) -> float:
-    original = self._prepare_data(original, transformed)
-    transformed = self._strip_data(transformed)
-    differences = [original[i] - transformed[i] for i in range(len(original))]
+    transformed = self._interpolate_data(original, transformed)
+    differences = [original[i].value - transformed[i].value for i in range(len(original))]
     if use_absolut_value:
       differences = map(math.fabs, differences)
     return sum(differences)
   
-  def arithmetic_average(self, original: List[float], transformed: List[float]) -> float:
+  def arithmetic_average(self, original: List[Measurement], transformed: List[Measurement]) -> float:
     return self.sum_differences(original, transformed) / len(original)
 
-  def standard_derivative(self, original: List[float], transformed: List[float]) -> float:
+  def standard_derivative(self, original: List[Measurement], transformed: List[Measurement]) -> float:
+    transformed = self._interpolate_data(original, transformed)
     n = len(original)
-    return math.sqrt(sum([(original[i] - transformed[i])**2 for i in range(n)]) / n)
+    return math.sqrt(sum([(original[i].value - transformed[i].value)**2 for i in range(n)]) / n)
     
   def function_field(self, original: List[float], transformed: List[float], normalize: bool = True) -> float:
     original_field, transformed_field = np.trapz(original), np.trapz(transformed)
