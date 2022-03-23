@@ -31,6 +31,7 @@ class Metric:
     last = original[data_original_count - 1]
     if last.timestamp != transformed[data_transformed_count - 1].timestamp:
       transformed.append(Measurement(last.value, last.timestamp))
+    transformed_count = len(transformed)
 
     for original_measurement in original:
       for i in range(current_index, transformed_count):
@@ -65,23 +66,25 @@ class Metric:
     n = len(original)
     return math.sqrt(sum([(original[i].value - transformed[i].value)**2 for i in range(n)]) / n)
     
-  def function_field(self, original: List[float], transformed: List[float], normalize: bool = True) -> float:
-    original_field, transformed_field = np.trapz(original), np.trapz(transformed)
+  def function_field(self, original: List[Measurement], transformed: List[float], normalize: bool = True) -> float:
+    original_field, transformed_field = np.trapz(self._strip_data(original)), np.trapz(self._strip_data(transformed))
     return math.fabs(original_field - transformed_field) / (max(original_field, transformed_field) if normalize else 1)
 
-  def min(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def diff_of_min(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     if show_diff:
-      return min(original) - min(transformed)
-    return min(transformed)
+      return min(self._strip_data(original)) - min(self._strip_data(transformed))
+    return min(self._strip_data(transformed))
 
-  def max(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def diff_of_max(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     if show_diff:
-      return max(original) - max(transformed)
-    return max(transformed)
+      return max(self._strip_data(original)) - max(self._strip_data(transformed))
+    return max(self._strip_data(transformed))
 
-  def min_max_diff(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def min_max_diff(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
+    transformed = self._strip_data(transformed)
     transformed_diff = abs(max(transformed) - min(transformed))
     if show_diff:
+      original = self._strip_data(original)
       original_diff = abs(max(original) - min(original))
       return abs(transformed_diff - original_diff)
     return transformed_diff
@@ -125,23 +128,29 @@ class Metric:
 
   def value_crossing(
       self, 
-      original: List[float], 
-      transformed: List[float], 
+      original: List[Measurement], 
+      transformed: List[Measurement], 
       border: float = 0, 
       threshold: float = 0, 
       show_diff: bool = True,
-      direction: int = 0
+      direction: int = 0,
+      avg_border: bool = True
     ) -> float:
     original_cross_count = 0
+    transformed = self._strip_data(transformed)
+    if avg_border:
+      border = self._mean(transformed)
     transformed_cross_count = self._value_crossing(transformed, border, threshold, direction)
     if show_diff:
-      original_cross_count = self._value_crossing(original, border, threshold, direction)
-    return transformed_cross_count - original_cross_count
+      original_cross_count = self._value_crossing(self._strip_data(original), border, threshold, direction)
+      if original_cross_count == 0:
+        original_cross_count = 1
+    return 1 - abs(transformed_cross_count - original_cross_count) / original_cross_count
 
   def positive_value_crossing(
       self, 
-      original: List[float], 
-      transformed: List[float], 
+      original: List[Measurement], 
+      transformed: List[Measurement], 
       border: float = 0, 
       threshold: float = 0, 
       show_diff: bool = True
@@ -150,8 +159,8 @@ class Metric:
 
   def negative_value_crossing(
       self, 
-      original: List[float], 
-      transformed: List[float], 
+      original: List[Measurement], 
+      transformed: List[Measurement], 
       border: float = 0, 
       threshold: float = 0, 
       show_diff: bool = True
@@ -196,37 +205,41 @@ class Metric:
 
     return [[i[0] for i in maxtab], [i[1] for i in maxtab]], [[i[0] for i in mintab], [i[1] for i in mintab]]
 
-  def peak_count(self, original: List[float], transformed: List[float], delta: float = 0.3, show_diff: bool = True) -> float:
+  def peak_count(self, original: List[Measurement], transformed: List[Measurement], delta: float = 0.3, show_diff: bool = True) -> float:
+    transformed = self._strip_data(transformed)
+    mean = self._mean(transformed)
+    derive = max([min(transformed), max(transformed)])
+    delta = abs(derive - mean) / 2
     original_peaks_count = 0
     peaks_positive, peaks_negative = self._peak_detector(transformed, [i for i in range(len(transformed))], delta)
     transformed_peaks_count = len(peaks_positive[0]) + len(peaks_negative[0])
     if show_diff:
-      peaks_positive, peaks_negative = self._peak_detector(original, [i for i in range(len(original))], delta)
+      peaks_positive, peaks_negative = self._peak_detector(self._strip_data(original), [i for i in range(len(original))], delta)
       original_peaks_count = len(peaks_positive[0]) + len(peaks_negative[0])
     return original_peaks_count - transformed_peaks_count
 
-  def positive_peak_count(self, original: List[float], transformed: List[float], delta: float = 0.3, show_diff: bool = True) -> float:
+  def positive_peak_count(self, original: List[Measurement], transformed: List[Measurement], delta: float = 0.3, show_diff: bool = True) -> float:
     original_peaks_count = 0
-    peaks_positive, _ = self._peak_detector(transformed, [i for i in range(len(transformed))], delta)
+    peaks_positive, _ = self._peak_detector(self._strip_data(transformed), [i for i in range(len(transformed))])
     transformed_peaks_count = len(peaks_positive[0])
     if show_diff:
-      peaks_positive, _ = self._peak_detector(original, [i for i in range(len(original))], delta)
+      peaks_positive, _ = self._peak_detector(self._strip_data(original), [i for i in range(len(original))])
       original_peaks_count = len(peaks_positive[0])
     return original_peaks_count - transformed_peaks_count
 
-  def negative_peak_count(self, original: List[float], transformed: List[float], delta: float = 0.3, show_diff: bool = True) -> float:
+  def negative_peak_count(self, original: List[Measurement], transformed: List[Measurement], delta: float = 0.3, show_diff: bool = True) -> float:
     original_peaks_count = 0
-    _, peaks_negative = self._peak_detector(transformed, [i for i in range(len(transformed))], delta)
+    _, peaks_negative = self._peak_detector(self._strip_data(transformed), [i for i in range(len(transformed))])
     transformed_peaks_count = len(peaks_negative[0])
     if show_diff:
-      _, peaks_negative = self._peak_detector(original, [i for i in range(len(original))], delta)
+      _, peaks_negative = self._peak_detector(self._strip_data(original), [i for i in range(len(original))])
       original_peaks_count = len(peaks_negative[0])
     return original_peaks_count - transformed_peaks_count
 
-  def median(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def median(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     if show_diff:
-      return statistics.median(original) - statistics.median(transformed)
-    return statistics.median(transformed)
+      return statistics.median(self._strip_data(original)) - statistics.median(self._strip_data(transformed))
+    return statistics.median(self._strip_data(transformed))
   
   def fft(self, transformed: List[float], show_plot: bool = False) -> Tuple[List[float], Any]:
     transformed_np_array = np.array(transformed)
@@ -248,11 +261,12 @@ class Metric:
       sum_distance += (x[i] - mean_x) * (y[i] - mean_y)
     return sum_distance * 1/n
 
-  def covariance(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def covariance(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     x_list = [i for i in range(len(transformed))]
     if show_diff:
-      return self._covariance(x_list, original) - self._covariance(x_list, transformed)
-    return self._covariance(x_list, transformed)
+      return self._covariance(x_list, self._strip_data(original)) - \
+        self._covariance(x_list, self._strip_data(transformed))
+    return self._covariance(x_list, self._strip_data(transformed))
 
   def _corelation_pearson(self, x: List[float], y: List[float]) -> float:
     mean_x = self._mean(x)
@@ -268,11 +282,12 @@ class Metric:
       sum_distance_square_y += distance_y ** 2
     return sum_distance / math.sqrt(sum_distance_square_x * sum_distance_square_y)
 
-  def corelation_pearson(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def corelation_pearson(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     x_list = [i for i in range(len(transformed))]
     if show_diff:
-      return self._corelation_pearson(x_list, original) - self._corelation_pearson(x_list, transformed)
-    return self._corelation_pearson(x_list, transformed)
+      return self._corelation_pearson(x_list, self._strip_data(original)) - \
+        self._corelation_pearson(x_list, self._strip_data(transformed))
+    return self._corelation_pearson(x_list, self._strip_data(transformed))
 
   def _corelation_spearman_on_injection(self, x: List[float], y: List[float]) -> float:
     data_len = len(x)
@@ -281,8 +296,6 @@ class Metric:
     next_rang = max_rang
     x_rangs = [i + 1 for i in range(max_rang)]
     y_rangs = []
-    y_sorted = sorted(y)
-    print(y_sorted)
     i = 0
     while i < data_len:
       values_count = 1
@@ -299,11 +312,12 @@ class Metric:
       distance_sum += (x_rangs[i] - y_rangs[i]) ** 2
     return 1 - ((6 * distance_sum) / (n * (n ** 2 - 1)))
 
-  def corelation_spearman(self, original: List[float], transformed: List[float], show_diff: bool = True) -> float:
+  def corelation_spearman(self, original: List[Measurement], transformed: List[Measurement], show_diff: bool = True) -> float:
     x_list = [i for i in range(len(transformed))]
     if show_diff:
-      return self._corelation_spearman_on_injection(x_list, original) - self._corelation_spearman_on_injection(x_list, transformed)
-    return self._corelation_spearman_on_injection(x_list, transformed)
+      return self._corelation_spearman_on_injection( x_list, self._strip_data(original)) - \
+        self._corelation_spearman_on_injection(x_list, self._strip_data(transformed))
+    return self._corelation_spearman_on_injection(x_list, self._strip_data(transformed))
 
-  def compression_ratio(self, original: List[float], transformed: List[float]) -> float:
+  def compression_ratio(self, original: List[Measurement], transformed: List[Measurement]) -> float:
     return len(transformed) / len(original)
