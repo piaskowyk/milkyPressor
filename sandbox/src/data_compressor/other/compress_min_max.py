@@ -30,8 +30,10 @@ class CompressMinMax(Compressor):
           min_measurement = measurement
         if max_measurement.value < measurement.value:
           max_measurement = measurement
-      measurements.remove(min_measurement)
-      measurements.remove(max_measurement)
+      if min_measurement in measurements:
+        measurements.remove(min_measurement)
+      if max_measurement in measurements:
+        measurements.remove(max_measurement)
       compressed_measurements_set.add(min_measurement)
       compressed_measurements_set.add(max_measurement)
     self.compressed_data = sorted(compressed_measurements_set, key=lambda measurement: measurement.timestamp)

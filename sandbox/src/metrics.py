@@ -52,6 +52,8 @@ class Metric:
     return self._strip_data(self._interpolate_data(original, transformed))
   
   def _cacl_score(self, original_value: float, transformed_value: float) -> float:
+    if original_value == 0:
+      return 1
     score = 1 - abs((original_value - transformed_value) / original_value)
     # if score > 1 or score < 0:
     #   raise Exception(f"score problem: {score}, {original_value}, {transformed_value}")
@@ -290,7 +292,10 @@ class Metric:
       sum_distance += distance_x * distance_y
       sum_distance_square_x += distance_x ** 2
       sum_distance_square_y += distance_y ** 2
-    return sum_distance / math.sqrt(sum_distance_square_x * sum_distance_square_y)
+    distance_sqrt = math.sqrt(sum_distance_square_x * sum_distance_square_y)
+    if distance_sqrt == 0:
+      return 1
+    return sum_distance / distance_sqrt
 
   def corelation_pearson_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
     x_list = [i for i in range(len(transformed))]

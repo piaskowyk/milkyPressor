@@ -24,7 +24,9 @@ class CompressSTC(Compressor):
       point_c = self.original_data[i]
       slope_angel_ab = (point_b.value - point_a.value) / (point_b.timestamp - point_a.timestamp)
       slope_angel_cb = (point_c.value - point_b.value) / (point_c.timestamp - point_b.timestamp)
-      ratio = abs(slope_angel_ab / slope_angel_cb - 1)
+      ratio = 0
+      if slope_angel_cb != 0:
+        ratio = abs(slope_angel_ab / slope_angel_cb - 1)
       if ratio > slope_angle_d:
         output.append(point_b)
 
