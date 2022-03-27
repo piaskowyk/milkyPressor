@@ -30,3 +30,5 @@ class CompressAPCADFT(Compressor):
     self.compressor.original_data = self.original_data
     self.compressor.compressed_data = self.compressed_data
     self.compressor.compress()
+    for measurement in self.compressor.compressed_data:
+      measurement.value = measurement.value.real
