@@ -1,4 +1,5 @@
 from src.metrics import Metric
+from src.line_metrics import LineMetric
 from src.data_type import Measurement
 from src.data_compressor.other import CompressNTHS
 from src.data_compressor.other import CompressMinMax
@@ -21,6 +22,7 @@ class AlgorythmSelector:
 
   def __init__(self) -> None:
     self.metrics_containter = Metric()
+    self.line_metrics_container = LineMetric()
     self.compressors: Dict[str, Compressor] = {
       'CompressNTHS': CompressNTHS(),
       'CompressMinMax': CompressMinMax(),
@@ -46,6 +48,28 @@ class AlgorythmSelector:
       for name, value in metrics.items():
         print(f"\t{name}:\t{value}")
   
+  def compute_line_metrics_for_data(self, data: List[Measurement]):
+    return {
+      'compression_rate': self.line_metrics_container.compression_ratio_score(data),
+      'sum_differences': self.line_metrics_container.sum_differences_score(data),
+      'arithmetic_average': self.line_metrics_container.arithmetic_average_score(data),
+      'standard_derivative': self.line_metrics_container.standard_derivative_score(data),
+      'function_field': self.line_metrics_container.function_field_score(data),
+      'diff_of_min': self.line_metrics_container.diff_of_min_score(data),
+      'diff_of_max': self.line_metrics_container.diff_of_max_score(data),
+      'min_max_diff': self.line_metrics_container.min_max_diff_score(data),
+      'value_crossing': self.line_metrics_container.value_crossing_score(data),
+      'positive_value_crossing': self.line_metrics_container.positive_value_crossing_score(data,),
+      'negative_value_crossing': self.line_metrics_container.negative_value_crossing_score(data),
+      'peak_count': self.line_metrics_container.peak_count_score(data),
+      'positive_peak_count': self.line_metrics_container.positive_peak_count_score(data),
+      'negative_peak_count': self.line_metrics_container.negative_peak_count_score(data),
+      'median': self.line_metrics_container.median_score(data),
+      'covariance': self.line_metrics_container.covariance_score(data),
+      'corelation_pearson': self.line_metrics_container.corelation_pearson_score(data),
+      'corelation_spearman': self.line_metrics_container.corelation_spearman_score(data),
+    }
+
   def get_best(self, data: List[Measurement]):
     metric_result = dict()
     for name, compressor in self.compressors.items():
@@ -79,4 +103,4 @@ class AlgorythmSelector:
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: -item[1])
     # todo: get best with the largest compress ratio
     best_method_name = sorted_methods[0][0]
-    return self.compressors[best_method_name]
+    return self.compressors[best_method_name], metric_result[best_method_name]

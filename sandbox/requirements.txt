@@ -1,1 +1,4 @@
 matplotlib
+scikit-learn
+sklearn-porter
+fogml
