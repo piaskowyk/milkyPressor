@@ -15,19 +15,9 @@
 */
 
 int classifier(double * x){
-  if (x[62] <= 0.3027277291) {
-    if (x[55] <= 0.7238609344) {
-      if (x[60] <= -0.0161668435) {
-        return CompressAPCADFT;
-      }
-      else {
-        if (x[54] <= -0.0374071077) {
-          return CompressPIP_PD;
-        }
-        else {
-          return CompressByChunk;
-        }
-      }
+  if (x[10] <= 0.1250000000) {
+    if (x[11] <= 0.0400000000) {
+      return CompressMinMax;
     }
     else {
       return CompressPIP_ED;

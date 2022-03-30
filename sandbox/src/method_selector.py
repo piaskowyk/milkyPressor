@@ -48,27 +48,55 @@ class AlgorythmSelector:
       for name, value in metrics.items():
         print(f"\t{name}:\t{value}")
   
+  def safe_division(self, a, b):
+    if b == 0:
+      return 0
+    else:
+      return a / b
+
   def compute_line_metrics_for_data(self, data: List[Measurement]):
+    data_count = self.line_metrics_container.data_count(data)
+    sum_value = self.line_metrics_container.sum_value(data)
+    arithmetic_average = self.line_metrics_container.arithmetic_average(data)
+    standard_derivative = self.line_metrics_container.standard_derivative(data)
+    function_field = self.line_metrics_container.function_field(data)
+    min_value = self.line_metrics_container.min_value(data)
+    max_value = self.line_metrics_container.max_value(data)
+    min_max_diff = self.line_metrics_container.min_max_diff(data)
+    value_crossing = self.line_metrics_container.value_crossing(data)
+    positive_value_crossing = self.line_metrics_container.positive_value_crossing(data)
+    negative_value_crossing = self.line_metrics_container.negative_value_crossing(data)
+    peak_count = self.line_metrics_container.peak_count(data)
+    positive_peak_count = self.line_metrics_container.positive_peak_count(data)
+    negative_peak_count = self.line_metrics_container.negative_peak_count(data)
+    median = self.line_metrics_container.median(data)
+    covariance = self.line_metrics_container.covariance(data)
+    corelation_pearson = self.line_metrics_container.corelation_pearson(data)
+    corelation_spearman = self.line_metrics_container.corelation_spearman(data)
     return {
-      'compression_rate': self.line_metrics_container.compression_ratio_score(data),
-      'sum_differences': self.line_metrics_container.sum_differences_score(data),
-      'arithmetic_average': self.line_metrics_container.arithmetic_average_score(data),
-      'standard_derivative': self.line_metrics_container.standard_derivative_score(data),
-      'function_field': self.line_metrics_container.function_field_score(data),
-      'diff_of_min': self.line_metrics_container.diff_of_min_score(data),
-      'diff_of_max': self.line_metrics_container.diff_of_max_score(data),
-      'min_max_diff': self.line_metrics_container.min_max_diff_score(data),
-      'value_crossing': self.line_metrics_container.value_crossing_score(data),
-      'positive_value_crossing': self.line_metrics_container.positive_value_crossing_score(data,),
-      'negative_value_crossing': self.line_metrics_container.negative_value_crossing_score(data),
-      'peak_count': self.line_metrics_container.peak_count_score(data),
-      'positive_peak_count': self.line_metrics_container.positive_peak_count_score(data),
-      'negative_peak_count': self.line_metrics_container.negative_peak_count_score(data),
-      'median': self.line_metrics_container.median_score(data),
-      'covariance': self.line_metrics_container.covariance_score(data),
-      'corelation_pearson': self.line_metrics_container.corelation_pearson_score(data),
-      'corelation_spearman': self.line_metrics_container.corelation_spearman_score(data),
+      'arithmetic_average': self.safe_division(arithmetic_average, sum_value),
+      'standard_derivative': standard_derivative,
+      'function_field': self.safe_division(function_field, sum_value),
+      'min_value': self.safe_division(min_value, max_value),
+      'max_value': self.safe_division(max_value, min_value),
+      'min_max_diff': self.safe_division(self.safe_division(min_max_diff, max_value), min_value),
+      'value_crossing': self.safe_division(value_crossing, data_count),
+      'positive_value_crossing': self.safe_division(positive_value_crossing, data_count),
+      'negative_value_crossing': self.safe_division(negative_value_crossing, data_count),
+      'peak_count': self.safe_division(peak_count, data_count),
+      'positive_peak_count': self.safe_division(positive_peak_count, data_count),
+      'negative_peak_count': self.safe_division(negative_peak_count, data_count),
+      'median': self.safe_division(median, sum_value),
+      'covariance': covariance,
+      'corelation_pearson': corelation_pearson,
+      'corelation_spearman': corelation_spearman,
     }
+
+  def metrics_to_input(self, metrics):
+    inputs = []
+    for _, value in metrics.items():
+      inputs.append(value)
+    return inputs
 
   def get_best(self, data: List[Measurement]):
     metric_result = dict()
