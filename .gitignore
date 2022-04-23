@@ -9,3 +9,5 @@ papers
 tmp
 pip_tmp
 *.pyc
+img
+sandbox/images
