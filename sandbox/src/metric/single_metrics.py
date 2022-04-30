@@ -287,3 +287,53 @@ class SingleMetric:
     x_list = [i for i in range(len(data))]
     corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(data))
     return corelation
+
+  def _print_result(self, metric_result):
+    for key, metrics in metric_result.items():
+      print(key)
+      for name, value in metrics.items():
+        print(f"\t{name}:\t{value}")
+
+  def _safe_division(self, a, b):
+    if b == 0:
+      return 0
+    else:
+      return a / b
+
+  def compute_all(self, data: List[Measurement]) -> List[float]:
+    data_count = self.data_count(data)
+    sum_value = self.sum_value(data)
+    arithmetic_average = self.arithmetic_average(data)
+    standard_derivative = self.standard_derivative(data)
+    function_field = self.function_field(data)
+    min_value = self.min_value(data)
+    max_value = self.max_value(data)
+    min_max_diff = self.min_max_diff(data)
+    value_crossing = self.value_crossing(data)
+    positive_value_crossing = self.positive_value_crossing(data)
+    negative_value_crossing = self.negative_value_crossing(data)
+    peak_count = self.peak_count(data)
+    positive_peak_count = self.positive_peak_count(data)
+    negative_peak_count = self.negative_peak_count(data)
+    median = self.median(data)
+    covariance = self.covariance(data)
+    corelation_pearson = self.corelation_pearson(data)
+    corelation_spearman = self.corelation_spearman(data)
+    return {
+      'arithmetic_average': self._safe_division(arithmetic_average, sum_value),
+      'standard_derivative': standard_derivative,
+      'function_field': self._safe_division(function_field, sum_value),
+      'min_value': self._safe_division(min_value, max_value),
+      'max_value': self._safe_division(max_value, min_value),
+      'min_max_diff': self._safe_division(self._safe_division(min_max_diff, max_value), min_value),
+      'value_crossing': self._safe_division(value_crossing, data_count),
+      'positive_value_crossing': self._safe_division(positive_value_crossing, data_count),
+      'negative_value_crossing': self._safe_division(negative_value_crossing, data_count),
+      'peak_count': self._safe_division(peak_count, data_count),
+      'positive_peak_count': self._safe_division(positive_peak_count, data_count),
+      'negative_peak_count': self._safe_division(negative_peak_count, data_count),
+      'median': self._safe_division(median, sum_value),
+      'covariance': covariance,
+      'corelation_pearson': corelation_pearson,
+      'corelation_spearman': corelation_spearman,
+    }

@@ -334,3 +334,25 @@ class ComparationMetric:
 
   def compression_ratio_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
     return 1 - len(transformed) / len(original)
+
+  def compute_all(self, original: List[Measurement], transformed: List[Measurement]) -> List[float]:
+    return {
+      'compression_rate': self.compression_ratio_score(original, transformed) * 2,
+      'sum_differences': self.sum_differences_score(original, transformed),
+      'arithmetic_average': self.arithmetic_average_score(original, transformed),
+      'standard_derivative': self.standard_derivative_score(original, transformed),
+      'function_field': self.function_field_score(original, transformed),
+      'diff_of_min': self.diff_of_min_score(original, transformed),
+      'diff_of_max': self.diff_of_max_score(original, transformed),
+      'min_max_diff': self.min_max_diff_score(original, transformed),
+      'value_crossing': self.value_crossing_score(original, transformed),
+      'positive_value_crossing': self.positive_value_crossing_score(original, transformed),
+      'negative_value_crossing': self.negative_value_crossing_score(original, transformed),
+      'peak_count': self.peak_count_score(original, transformed),
+      'positive_peak_count': self.positive_peak_count_score(original, transformed),
+      'negative_peak_count': self.negative_peak_count_score(original, transformed),
+      'median': self.median_score(original, transformed),
+      'covariance': self.covariance_score(original, transformed),
+      'corelation_pearson': self.corelation_pearson_score(original, transformed),
+      'corelation_spearman': self.corelation_spearman_score(original, transformed),
+    }
