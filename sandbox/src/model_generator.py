@@ -1,8 +1,8 @@
-from data_type import Measurement
 from typing import List
-from method_selector import MlMethodSelector
-
 from fogml.generators import GeneratorFactory
+
+from .data_type import Measurement
+from .method_selector import MlMethodSelector
 
 class ModelGenerator:
   def __init__(self) -> None:

@@ -1,10 +1,10 @@
-from metric import SingleMetric
-from data_type import Measurement
 from typing import List
-from method_selector import ClassicMethodSelector, MlMethodSelector
-from measurement_provider import MeasurementProvider
-from method_selector import ClassicMethodSelector
 from sklearn import tree
+
+from ..data_type import Measurement
+from ..metric import SingleMetric
+from ..method_selector import ClassicMethodSelector
+from ..measurement_provider import MeasurementProvider
 
 class MlMethodSelector:
   def __init__(self) -> None:
@@ -37,6 +37,7 @@ class MlMethodSelector:
     for measurements in self.measurements_set:
       classic_method_selector = ClassicMethodSelector()
       best_method_name = classic_method_selector.get_best(measurements)
-      input = self.single_metrics_container.compute_all(measurements)
+      single_metrics = self.single_metrics_container.compute_all(measurements)
+      input = list(single_metrics.values())
       dataset.append([input, best_method_name])
     return dataset

@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from src.metrics import Metric
 from src.data_type import Measurement
 from typing import List
 import os
@@ -8,7 +7,6 @@ class Compressor:
 
   def __init__(self) -> None:
     super().__init__()
-    self.metric: Metric = Metric()
     self.original_data: List[Measurement] = []
     self.compressed_data: List[Measurement] = []
     self.config = {}
