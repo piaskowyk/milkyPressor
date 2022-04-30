@@ -1,3 +1,0 @@
-[submodule "Anjay"]
-	path = Anjay
-	url = https://github.com/AVSystem/Anjay/tree/2.14.0

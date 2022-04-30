@@ -1,0 +1,3 @@
+class SenMLCBORSerializer:
+  pass
+# todo
