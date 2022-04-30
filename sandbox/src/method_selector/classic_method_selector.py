@@ -54,44 +54,6 @@ class ClassicMethodSelector:
     else:
       return a / b
 
-  def compute_line_metrics_for_data(self, data: List[Measurement]):
-    data_count = self.line_metrics_container.data_count(data)
-    sum_value = self.line_metrics_container.sum_value(data)
-    arithmetic_average = self.line_metrics_container.arithmetic_average(data)
-    standard_derivative = self.line_metrics_container.standard_derivative(data)
-    function_field = self.line_metrics_container.function_field(data)
-    min_value = self.line_metrics_container.min_value(data)
-    max_value = self.line_metrics_container.max_value(data)
-    min_max_diff = self.line_metrics_container.min_max_diff(data)
-    value_crossing = self.line_metrics_container.value_crossing(data)
-    positive_value_crossing = self.line_metrics_container.positive_value_crossing(data)
-    negative_value_crossing = self.line_metrics_container.negative_value_crossing(data)
-    peak_count = self.line_metrics_container.peak_count(data)
-    positive_peak_count = self.line_metrics_container.positive_peak_count(data)
-    negative_peak_count = self.line_metrics_container.negative_peak_count(data)
-    median = self.line_metrics_container.median(data)
-    covariance = self.line_metrics_container.covariance(data)
-    corelation_pearson = self.line_metrics_container.corelation_pearson(data)
-    corelation_spearman = self.line_metrics_container.corelation_spearman(data)
-    return {
-      'arithmetic_average': self.safe_division(arithmetic_average, sum_value),
-      'standard_derivative': standard_derivative,
-      'function_field': self.safe_division(function_field, sum_value),
-      'min_value': self.safe_division(min_value, max_value),
-      'max_value': self.safe_division(max_value, min_value),
-      'min_max_diff': self.safe_division(self.safe_division(min_max_diff, max_value), min_value),
-      'value_crossing': self.safe_division(value_crossing, data_count),
-      'positive_value_crossing': self.safe_division(positive_value_crossing, data_count),
-      'negative_value_crossing': self.safe_division(negative_value_crossing, data_count),
-      'peak_count': self.safe_division(peak_count, data_count),
-      'positive_peak_count': self.safe_division(positive_peak_count, data_count),
-      'negative_peak_count': self.safe_division(negative_peak_count, data_count),
-      'median': self.safe_division(median, sum_value),
-      'covariance': covariance,
-      'corelation_pearson': corelation_pearson,
-      'corelation_spearman': corelation_spearman,
-    }
-
   def metrics_to_input(self, metrics):
     inputs = []
     for _, value in metrics.items():
@@ -129,6 +91,5 @@ class ClassicMethodSelector:
     for method_name, metrics_value in metric_result.items():
       agregated_metrics[method_name] = sum(metrics_value.values())
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: -item[1])
-    # todo: get best with the largest compress ratio
     best_method_name = sorted_methods[0][0]
-    return self.compressors[best_method_name], metric_result[best_method_name]
+    return best_method_name, metric_result[best_method_name]
