@@ -43,10 +43,11 @@ class ClassicMethodSelector:
     pass # todo
 
   def print_result(self, metric_result):
-    for key, metrics in metric_result.items():
-      print(key)
-      for name, value in metrics.items():
-        print(f"\t{name}:\t{value}")
+    # for key, metrics in metric_result.items():
+    #   print(key)
+    #   for name, value in metrics.items():
+    #     print(f"\t{name}:\t{value}")
+    pass
   
   def safe_division(self, a, b):
     if b == 0:
@@ -54,11 +55,45 @@ class ClassicMethodSelector:
     else:
       return a / b
 
-  def metrics_to_input(self, metrics):
-    inputs = []
-    for _, value in metrics.items():
-      inputs.append(value)
-    return inputs
+  def compute_line_metrics_for_data(self, data: List[Measurement]):
+    data_count = self.line_metrics_container.data_count(data)
+    sum_value = self.line_metrics_container.sum_value(data)
+    arithmetic_average = self.line_metrics_container.arithmetic_average(data)
+    standard_derivative = self.line_metrics_container.standard_derivative(data)
+    function_field = self.line_metrics_container.function_field(data)
+    min_value = self.line_metrics_container.min_value(data)
+    max_value = self.line_metrics_container.max_value(data)
+    min_max_diff = self.line_metrics_container.min_max_diff(data)
+    value_crossing = self.line_metrics_container.value_crossing(data)
+    positive_value_crossing = self.line_metrics_container.positive_value_crossing(data)
+    negative_value_crossing = self.line_metrics_container.negative_value_crossing(data)
+    peak_count = self.line_metrics_container.peak_count(data)
+    positive_peak_count = self.line_metrics_container.positive_peak_count(data)
+    negative_peak_count = self.line_metrics_container.negative_peak_count(data)
+    median = self.line_metrics_container.median(data)
+    covariance = self.line_metrics_container.covariance(data)
+    corelation_pearson = self.line_metrics_container.corelation_pearson(data)
+    corelation_spearman = self.line_metrics_container.corelation_spearman(data)
+    metric_result = {
+      'arithmetic_average': self.safe_division(arithmetic_average, sum_value),
+      'standard_derivative': standard_derivative,
+      'function_field': self.safe_division(function_field, sum_value),
+      'min_value': self.safe_division(min_value, max_value),
+      'max_value': self.safe_division(max_value, min_value),
+      'min_max_diff': self.safe_division(self.safe_division(min_max_diff, max_value), min_value),
+      'value_crossing': self.safe_division(value_crossing, data_count),
+      'positive_value_crossing': self.safe_division(positive_value_crossing, data_count),
+      'negative_value_crossing': self.safe_division(negative_value_crossing, data_count),
+      'peak_count': self.safe_division(peak_count, data_count),
+      'positive_peak_count': self.safe_division(positive_peak_count, data_count),
+      'negative_peak_count': self.safe_division(negative_peak_count, data_count),
+      'median': self.safe_division(median, sum_value),
+      'covariance': covariance,
+      'corelation_pearson': corelation_pearson,
+      'corelation_spearman': corelation_spearman,
+    }
+    self.print_result(metric_result)
+    return metric_result
 
   def get_best(self, data: List[Measurement]):
     metric_result = dict()
@@ -86,10 +121,10 @@ class ClassicMethodSelector:
         'corelation_pearson': self.metrics_containter.corelation_pearson_score(data, compressed_data),
         'corelation_spearman': self.metrics_containter.corelation_spearman_score(data, compressed_data),
       }
-      # self.print_result(metric_result)
+      self.print_result(metric_result)
     agregated_metrics = dict()
     for method_name, metrics_value in metric_result.items():
       agregated_metrics[method_name] = sum(metrics_value.values())
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: -item[1])
     best_method_name = sorted_methods[0][0]
-    return best_method_name, metric_result[best_method_name]
+    return best_method_name, list(metric_result[best_method_name].values())

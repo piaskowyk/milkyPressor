@@ -1,13 +1,11 @@
-from calendar import c
 import math
-from re import S
 import matplotlib.pyplot as plt
 from typing import Tuple, Any, List
 import numpy as np
 import statistics
 from src.data_type import Measurement
 
-class Metric:
+class SingleMetric:
 
   def _strip_data(self, data: List[Measurement]):
     return [item.value for item in data]
@@ -51,45 +49,21 @@ class Metric:
   def _prepare_data(self, original: List[Measurement], transformed: List[Measurement]):
     return self._strip_data(self._interpolate_data(original, transformed))
   
-  def _cacl_score(self, original_value: float, transformed_value: float) -> float:
-    if original_value == 0:
-      return 1
-    score = 1 - abs((original_value - transformed_value) / original_value)
-    # if score > 1 or score < 0:
-    #   raise Exception(f"score problem: {score}, {original_value}, {transformed_value}")
-    return max(0, score)
+  def data_count(self, data: List[Measurement]) -> float:
+    return len(data)
 
-  def sum_differences_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_data_count = len(original)
-    if original_data_count < 2:
-      return 1
-    transformed = self._interpolate_data(original, transformed)
-    transformed_diff = sum([math.fabs(original[i].value - transformed[i].value) for i in range(len(original))])
-    point_a = original[0]
-    point_b = original[original_data_count - 1]
-    f_a = (point_b.value - point_a.value) / (point_b.timestamp - point_a.timestamp)
-    f_b = (point_b.timestamp * point_a.value - point_a.timestamp * point_b.value) / (point_b.timestamp - point_a.timestamp)
-    maximum_diff = sum([math.fabs(original[i].value - (f_a * original[i].timestamp + f_b)) for i in range(len(original))])
-    score = 1 - transformed_diff / maximum_diff
-    return max(score, 0)
-  
-  def arithmetic_average_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original = self._strip_data(original)
-    transformed = self._strip_data(transformed)
-    original_avg = sum(original) / len(original)
-    transformed_avg = sum(transformed) / len(transformed)
-    return self._cacl_score(original_avg, transformed_avg)
+  def sum_value(self, data: List[Measurement]) -> float:
+    return sum(self._strip_data(data))
 
-  def standard_derivative_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original = self._strip_data(original)
-    original_mean = self._mean(original)
-    n = len(original)
-    original_standard_derivative = math.sqrt(sum([(original[i] - original_mean)**2 for i in range(n)]) / n)
-    transformed = self._strip_data(transformed)
-    transformed_mean = self._mean(transformed)
-    n = len(transformed)
-    transformed_standard_derivative = math.sqrt(sum([(transformed[i] - transformed_mean)**2 for i in range(n)]) / n)
-    return self._cacl_score(original_standard_derivative, transformed_standard_derivative)
+  def arithmetic_average(self, data: List[Measurement]) -> float:
+    return sum(self._strip_data(data)) / len(data)
+
+  def standard_derivative(self, data: List[Measurement]) -> float:
+    data = self._strip_data(data)
+    mean = self._mean(data)
+    n = len(data)
+    standard_derivative = math.sqrt(sum([(data[i] - mean)**2 for i in range(n)]) / n)
+    return standard_derivative
     
   def _function_field(self, data: List[Measurement]) -> float:
     field = 0
@@ -102,27 +76,21 @@ class Metric:
       field += (a + b) * h / 2
     return field
 
-  def function_field_score(self, original: List[Measurement], transformed: List[float]) -> float:
-    original_field = self._function_field(original)
-    transformed_field = self._function_field(transformed)
-    return self._cacl_score(original_field, transformed_field)
+  def function_field(self, data: List[Measurement]) -> float:
+    field = self._function_field(data)
+    return field
 
-  def diff_of_min_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_min = min(self._strip_data(original))
-    trnsformed_min = min(self._strip_data(transformed))
-    return self._cacl_score(original_min, trnsformed_min)
+  def min_value(self, data: List[Measurement]) -> float:
+    data_min = min(self._strip_data(data))
+    return data_min
 
-  def diff_of_max_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_max = max(self._strip_data(original))
-    trnsformed_max = max(self._strip_data(transformed))
-    return self._cacl_score(original_max, trnsformed_max)
+  def max_value(self, data: List[Measurement]) -> float:
+    data_max = max(self._strip_data(data))
+    return data_max
 
-  def min_max_diff_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    transformed = self._strip_data(transformed)
-    transformed_diff = abs(max(transformed) - min(transformed))
-    original = self._strip_data(original)
-    original_diff = abs(max(original) - min(original))
-    return self._cacl_score(original_diff, transformed_diff)
+  def min_max_diff(self, data: List[Measurement]) -> float:
+    diff = abs(self.max_value(data) - self.min_value(data))
+    return diff
 
   def _value_crossing(self, data: List[float], border: float = 0, threshold: float = 0, direction: int = 0) -> float:
     if len(data) == 0:
@@ -161,27 +129,22 @@ class Metric:
 
     return counter
 
-  def value_crossing_score(
+  def value_crossing(
       self, 
-      original: List[Measurement], 
-      transformed: List[Measurement],
+      data: List[Measurement],
       direction: int = 0
     ) -> float:
-    original = self._strip_data(original)
-    transformed = self._strip_data(transformed)
-    border = self._mean(original)
+    data = self._strip_data(data)
+    border = self._mean(data)
     threshold = border * 0.01
-    original_cross_count = self._value_crossing(original, border, threshold, direction)
-    transformed_cross_count = self._value_crossing(transformed, border, threshold, direction)
-    if original_cross_count == 0:
-      original_cross_count = 1
-    return self._cacl_score(original_cross_count, transformed_cross_count)
+    cross_count = self._value_crossing(data, border, threshold, direction)
+    return cross_count
 
-  def positive_value_crossing_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    return self.value_crossing_score(original, transformed, 1)
+  def positive_value_crossing(self, data: List[Measurement]) -> float:
+    return self.value_crossing(data, 1)
 
-  def negative_value_crossing_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    return self.value_crossing_score(original, transformed, -1)
+  def negative_value_crossing(self, data: List[Measurement]) -> float:
+    return self.value_crossing(data, -1)
 
   def _peak_detector(
       self, 
@@ -234,25 +197,21 @@ class Metric:
     else:
       return len(peaks_positive[0])
 
-  def peak_count_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_peaks_count = self._get_peaks_count(original, 0)
-    transformed_peaks_count = self._get_peaks_count(transformed, 0)
-    return self._cacl_score(original_peaks_count, transformed_peaks_count)
+  def peak_count(self, data: List[Measurement]) -> float:
+    peaks_count = self._get_peaks_count(data, 0)
+    return peaks_count
 
-  def positive_peak_count_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_peaks_count = self._get_peaks_count(original, 1)
-    transformed_peaks_count = self._get_peaks_count(transformed, 1)
-    return self._cacl_score(original_peaks_count, transformed_peaks_count)
+  def positive_peak_count(self, data: List[Measurement]) -> float:
+    peaks_count = self._get_peaks_count(data, 1)
+    return peaks_count
 
-  def negative_peak_count_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_peaks_count = self._get_peaks_count(original, -1)
-    transformed_peaks_count = self._get_peaks_count(transformed, -1)
-    return self._cacl_score(original_peaks_count, transformed_peaks_count)
+  def negative_peak_count(self, data: List[Measurement]) -> float:
+    peaks_count = self._get_peaks_count(data, -1)
+    return peaks_count
 
-  def median_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_median = statistics.median(self._strip_data(original))
-    transformed_median = statistics.median(self._strip_data(transformed))
-    return self._cacl_score(original_median, transformed_median)
+  def median(self, data: List[Measurement]) -> float:
+    median = statistics.median(self._strip_data(data))
+    return median
   
   def fft(self, transformed: List[float], show_plot: bool = False) -> Tuple[List[float], Any]:
     transformed_np_array = np.array(transformed)
@@ -274,11 +233,10 @@ class Metric:
       sum_distance += (x[i] - mean_x) * (y[i] - mean_y)
     return sum_distance * 1/n
 
-  def covariance_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_covariance = self._covariance(x_list, self._strip_data(original))
-    transformed_covariance = self._covariance(x_list, self._strip_data(transformed))
-    return self._cacl_score(original_covariance, transformed_covariance)
+  def covariance(self, data: List[Measurement]) -> float:
+    x_list = [i for i in range(len(data))]
+    covariance = self._covariance(x_list, self._strip_data(data))
+    return covariance
 
   def _corelation_pearson(self, x: List[float], y: List[float]) -> float:
     mean_x = self._mean(x)
@@ -297,11 +255,10 @@ class Metric:
       return 1
     return sum_distance / distance_sqrt
 
-  def corelation_pearson_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_corelation = self._corelation_pearson(x_list, self._strip_data(original))
-    transformed_corelation = self._corelation_pearson(x_list, self._strip_data(transformed))
-    return self._cacl_score(original_corelation, transformed_corelation)
+  def corelation_pearson(self, data: List[Measurement]) -> float:
+    x_list = [i for i in range(len(data))]
+    corelation = self._corelation_pearson(x_list, self._strip_data(data))
+    return corelation
 
   def _corelation_spearman_on_injection(self, x: List[float], y: List[float]) -> float:
     data_len = len(x)
@@ -326,11 +283,7 @@ class Metric:
       distance_sum += (x_rangs[i] - y_rangs[i]) ** 2
     return 1 - ((6 * distance_sum) / (n * (n ** 2 - 1)))
 
-  def corelation_spearman_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(original))
-    transformed_corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(transformed))
-    return self._cacl_score(original_corelation, transformed_corelation)
-
-  def compression_ratio_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    return 1 - len(transformed) / len(original)
+  def corelation_spearman(self, data: List[Measurement]) -> float:
+    x_list = [i for i in range(len(data))]
+    corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(data))
+    return corelation
