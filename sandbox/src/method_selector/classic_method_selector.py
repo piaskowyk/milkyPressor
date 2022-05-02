@@ -1,14 +1,6 @@
+from src.data_compressor.compressors_provider import CompressorsProvider
 from src.metric import ComparationMetric
 from src.data_type import Measurement
-from src.data_compressor.other import CompressNTHS, CompressMinMax, CompressPWP, NoCompress
-from src.data_compressor.pip import CompressPIP_ED, CompressPIP_PD, CompressPIP_VD
-from src.data_compressor.paa import CompressPAA
-from src.data_compressor.paa import CompressPAAVI
-from src.data_compressor.paa import CompressByChunk
-from src.data_compressor.pla import CompressAPCADFT
-from src.data_compressor.pla import CompressAPCAFFT
-from src.data_compressor.pla import CompressSTC
-from src.data_compressor.pla import CompressHigherDeriveration
 from src.data_compressor.compressor import Compressor
 from typing import List, Dict
 from collections import defaultdict as dict
@@ -18,21 +10,7 @@ class ClassicMethodSelector:
   def __init__(self) -> None:
     self.comparation_metrics_containter = ComparationMetric()
     self.metrics = None
-    self.compressors: Dict[str, Compressor] = {
-      'CompressNTHS': CompressNTHS(),
-      'CompressMinMax': CompressMinMax(),
-      'CompressPWP': CompressPWP(),
-      'CompressPIP_ED': CompressPIP_ED(),
-      'CompressPIP_PD': CompressPIP_PD(),
-      'CompressPIP_VD': CompressPIP_VD(),
-      'CompressPAA': CompressPAA(),
-      'CompressPAAVI': CompressPAAVI(),
-      'CompressByChunk': CompressByChunk(),
-      'CompressAPCADFT': CompressAPCADFT(),
-      'CompressAPCAFFT': CompressAPCAFFT(),
-      'CompressSTC': CompressSTC(),
-      'CompressHigherDeriveration': CompressHigherDeriveration(),
-    }
+    self.compressors: Dict[str, Compressor] = CompressorsProvider.get_compressors()
 
   def set_metrics(self, metrics):
     self.metrics = metrics

@@ -29,9 +29,9 @@ class MeasurementProvider:
     ]
     return [self.to_measurements(signal_generator) for signal_generator in signal_generators]
 
-  def json_to_measurements(path: str):
+  def json_to_measurements(self, path: str):
     result = []
-    with open(path, 'r') as file:
+    with open(f'../datasets/parsed/{path}', 'r') as file:
       json_object = json.load(file)
     for item in json_object:
       result.append(Measurement(item['value'], item['timestamp']))
