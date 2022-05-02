@@ -1,0 +1,15 @@
+sandbox/venv
+.vscode
+LwM2M_server
+data_compressor_app/CMakeFiles
+data_compressor_app/data-compressor-app
+data_compressor_app/CMakeCache.txt
+data_compressor_app/cmake_install.cmake
+papers
+tmp
+pip_tmp
+*.pyc
+img
+sandbox/images
+Anjay
+datasets
