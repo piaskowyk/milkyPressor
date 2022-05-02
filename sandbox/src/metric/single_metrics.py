@@ -1,3 +1,4 @@
+from enum import Enum
 import math
 import matplotlib.pyplot as plt
 from typing import Tuple, Any, List
@@ -5,6 +6,24 @@ import numpy as np
 import statistics
 from src.data_type import Measurement
 
+class SingleMetricEnum(Enum):
+  arithmetic_average = 'arithmetic_average'
+  standard_derivative = 'standard_derivative'
+  function_field = 'function_field'
+  min_value = 'min_value'
+  max_value = 'max_value'
+  min_max_diff = 'min_max_diff'
+  value_crossing = 'value_crossing'
+  positive_value_crossing = 'positive_value_crossing'
+  negative_value_crossing = 'negative_value_crossing'
+  peak_count = 'peak_count'
+  positive_peak_count = 'positive_peak_count'
+  negative_peak_count = 'negative_peak_count'
+  median = 'median'
+  covariance = 'covariance'
+  corelation_pearson = 'corelation_pearson'
+  corelation_spearman = 'corelation_spearman'
+  
 class SingleMetric:
 
   def _strip_data(self, data: List[Measurement]):
@@ -303,11 +322,11 @@ class SingleMetric:
   def compute_all(self, data: List[Measurement]) -> List[float]:
     data_count = self.data_count(data)
     sum_value = self.sum_value(data)
+    min_value = self.min_value(data)
+    max_value = self.max_value(data)
     arithmetic_average = self.arithmetic_average(data)
     standard_derivative = self.standard_derivative(data)
     function_field = self.function_field(data)
-    min_value = self.min_value(data)
-    max_value = self.max_value(data)
     min_max_diff = self.min_max_diff(data)
     value_crossing = self.value_crossing(data)
     positive_value_crossing = self.positive_value_crossing(data)
@@ -337,3 +356,12 @@ class SingleMetric:
       'corelation_pearson': corelation_pearson,
       'corelation_spearman': corelation_spearman,
     }
+
+  def compute_metrics(self, data: List[Measurement], metrics: List[SingleMetricEnum] = None) -> List[float]:
+    all_metrics = self.compute_all(data)
+    if metrics == None:
+      return all_metrics
+    result = dict()
+    for metric_name in metrics:
+      result[metric_name.value] = all_metrics[metric_name.value]
+    return result

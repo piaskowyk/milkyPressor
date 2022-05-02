@@ -1,13 +1,53 @@
-from calendar import c
 import math
-from re import S
+from enum import Enum
 import matplotlib.pyplot as plt
-from typing import Tuple, Any, List
+from typing import Dict, Tuple, Any, List
 import numpy as np
 import statistics
 from src.data_type import Measurement
 
+class ComparationMetricEnum(Enum):
+  compression_rate = 'compression_rate'
+  sum_differences = 'sum_differences'
+  arithmetic_average = 'arithmetic_average'
+  standard_derivative = 'standard_derivative'
+  function_field = 'function_field'
+  diff_of_min = 'diff_of_min'
+  diff_of_max = 'diff_of_max'
+  min_max_diff = 'min_max_diff'
+  value_crossing = 'value_crossing'
+  positive_value_crossing = 'positive_value_crossing'
+  negative_value_crossing = 'negative_value_crossing'
+  peak_count = 'peak_count'
+  positive_peak_count = 'positive_peak_count'
+  negative_peak_count = 'negative_peak_count'
+  median = 'median'
+  covariance = 'covariance'
+  corelation_pearson = 'corelation_pearson'
+  corelation_spearman = 'corelation_spearman'
+
 class ComparationMetric:
+  def __init__(self) -> None:
+    self.method_invoker = {
+      'compression_rate': lambda original, transformed: self.compression_ratio_score(original, transformed),
+      'sum_differences': lambda original, transformed: self.sum_differences_score(original, transformed),
+      'arithmetic_average': lambda original, transformed: self.arithmetic_average_score(original, transformed),
+      'standard_derivative': lambda original, transformed: self.standard_derivative_score(original, transformed),
+      'function_field': lambda original, transformed: self.function_field_score(original, transformed),
+      'diff_of_min': lambda original, transformed: self.diff_of_min_score(original, transformed),
+      'diff_of_max': lambda original, transformed: self.diff_of_max_score(original, transformed),
+      'min_max_diff': lambda original, transformed: self.min_max_diff_score(original, transformed),
+      'value_crossing': lambda original, transformed: self.value_crossing_score(original, transformed),
+      'positive_value_crossing': lambda original, transformed: self.positive_value_crossing_score(original, transformed),
+      'negative_value_crossing': lambda original, transformed: self.negative_value_crossing_score(original, transformed),
+      'peak_count': lambda original, transformed: self.peak_count_score(original, transformed),
+      'positive_peak_count': lambda original, transformed: self.positive_peak_count_score(original, transformed),
+      'negative_peak_count': lambda original, transformed: self.negative_peak_count_score(original, transformed),
+      'median': lambda original, transformed: self.median_score(original, transformed),
+      'covariance': lambda original, transformed: self.covariance_score(original, transformed),
+      'corelation_pearson': lambda original, transformed: self.corelation_pearson_score(original, transformed),
+      'corelation_spearman': lambda original, transformed: self.corelation_spearman_score(original, transformed),
+    }
 
   def _strip_data(self, data: List[Measurement]):
     return [item.value for item in data]
@@ -335,24 +375,17 @@ class ComparationMetric:
   def compression_ratio_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
     return 1 - len(transformed) / len(original)
 
-  def compute_all(self, original: List[Measurement], transformed: List[Measurement]) -> List[float]:
-    return {
-      'compression_rate': self.compression_ratio_score(original, transformed) * 2,
-      'sum_differences': self.sum_differences_score(original, transformed),
-      'arithmetic_average': self.arithmetic_average_score(original, transformed),
-      'standard_derivative': self.standard_derivative_score(original, transformed),
-      'function_field': self.function_field_score(original, transformed),
-      'diff_of_min': self.diff_of_min_score(original, transformed),
-      'diff_of_max': self.diff_of_max_score(original, transformed),
-      'min_max_diff': self.min_max_diff_score(original, transformed),
-      'value_crossing': self.value_crossing_score(original, transformed),
-      'positive_value_crossing': self.positive_value_crossing_score(original, transformed),
-      'negative_value_crossing': self.negative_value_crossing_score(original, transformed),
-      'peak_count': self.peak_count_score(original, transformed),
-      'positive_peak_count': self.positive_peak_count_score(original, transformed),
-      'negative_peak_count': self.negative_peak_count_score(original, transformed),
-      'median': self.median_score(original, transformed),
-      'covariance': self.covariance_score(original, transformed),
-      'corelation_pearson': self.corelation_pearson_score(original, transformed),
-      'corelation_spearman': self.corelation_spearman_score(original, transformed),
-    }
+  def compute_all(self, original: List[Measurement], transformed: List[Measurement]) -> Dict[str, float]:
+    result = dict()
+    for metric_name in self.method_invoker.keys():
+      result[metric_name] = self.method_invoker[metric_name](original, transformed)
+    return result
+
+  def compute_metrics(self, original: List[Measurement], transformed: List[Measurement], metrics: List[ComparationMetricEnum] = None) -> List[float]:
+    if metrics == None:
+      return self.compute_all(original, transformed)
+    result = dict()
+    for metric_name in metrics:
+      result[metric_name.value] = self.method_invoker[metric_name.value](original, transformed)
+    return result
+    

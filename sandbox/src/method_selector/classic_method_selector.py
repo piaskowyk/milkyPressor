@@ -1,11 +1,7 @@
 from src.metric import ComparationMetric
 from src.data_type import Measurement
-from src.data_compressor.other import CompressNTHS
-from src.data_compressor.other import CompressMinMax
-from src.data_compressor.other import CompressPWP
-from src.data_compressor.pip import CompressPIP_ED
-from src.data_compressor.pip import CompressPIP_PD
-from src.data_compressor.pip import CompressPIP_VD
+from src.data_compressor.other import CompressNTHS, CompressMinMax, CompressPWP, NoCompress
+from src.data_compressor.pip import CompressPIP_ED, CompressPIP_PD, CompressPIP_VD
 from src.data_compressor.paa import CompressPAA
 from src.data_compressor.paa import CompressPAAVI
 from src.data_compressor.paa import CompressByChunk
@@ -21,6 +17,7 @@ class ClassicMethodSelector:
 
   def __init__(self) -> None:
     self.comparation_metrics_containter = ComparationMetric()
+    self.metrics = None
     self.compressors: Dict[str, Compressor] = {
       'CompressNTHS': CompressNTHS(),
       'CompressMinMax': CompressMinMax(),
@@ -37,8 +34,8 @@ class ClassicMethodSelector:
       'CompressHigherDeriveration': CompressHigherDeriveration(),
     }
 
-  def set_metrics(self):
-    pass # todo
+  def set_metrics(self, metrics):
+    self.metrics = metrics
 
   def print_result(self, metric_result):
     for key, metrics in metric_result.items():
@@ -52,7 +49,7 @@ class ClassicMethodSelector:
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data
-      metric_result[name] = self.comparation_metrics_containter.compute_all(data, compressed_data)
+      metric_result[name] = self.comparation_metrics_containter.compute_metrics(data, compressed_data, self.metrics)
       # self.print_result(metric_result)
     agregated_metrics = dict()
     for method_name, metrics_value in metric_result.items():

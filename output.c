@@ -15,24 +15,29 @@
 */
 
 int classifier(double * x){
-  if (x[9] <= 0.1900000051) {
-    if (x[15] <= 0.9054305553) {
-      return CompressMinMax;
-    }
-    else {
-      return CompressPIP_ED;
-    }
+  if (x[1] <= 0.0049487797) {
+    return CompressNTHS;
   }
   else {
-    if (x[5] <= -1.3726827502) {
-      return CompressSTC;
+    if (x[2] <= -1.6061705947) {
+      return CompressHigherDeriveration;
     }
     else {
-      if (x[2] <= -126.7160949707) {
+      if (x[2] <= -0.4879163019) {
         return CompressSTC;
       }
       else {
-        return CompressHigherDeriveration;
+        if (x[1] <= 0.0096296482) {
+          return CompressHigherDeriveration;
+        }
+        else {
+          if (x[1] <= 0.0130294086) {
+            return CompressMinMax;
+          }
+          else {
+            return CompressPIP_ED;
+          }
+        }
       }
     }
   }

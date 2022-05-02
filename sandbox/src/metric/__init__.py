@@ -1,2 +1,2 @@
-from .comparation_metrics import ComparationMetric
-from .single_metrics import SingleMetric
+from .comparation_metrics import ComparationMetric, ComparationMetricEnum
+from .single_metrics import SingleMetric, SingleMetricEnum
