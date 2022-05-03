@@ -50,7 +50,7 @@ class CompressAPCAFT(Compressor):
           max_index = index
       main_frequencies.append((max_index, max_value))
       frequencies[max_index] = 0
-      points_count_limit -= frequency.real
+      points_count_limit -= max_index
       if points_count_limit <= 0:
         break
     return main_frequencies
@@ -70,7 +70,7 @@ class CompressAPCAFT(Compressor):
     dft = self._call_ft_function(values)
     frequencies = self._get_main_frequencies(dft, points_count_limit)
     for frequency, amplitude in frequencies:
-      data = [2 * amplitude * cmath.exp(2j * self.PI * i * frequency / data_count) for i in range(data_count)]
+      data = [amplitude * cmath.exp(2j * self.PI * i * frequency / data_count) for i in range(data_count)]
       frequency_series.append(data)
       peaks = self._get_peaks(data)
       if points_count_limit > len(points_x):

@@ -2,22 +2,21 @@ from src.data_compressor.compressor import Compressor
 
 class CompressMinMax(Compressor):
 
-  def __init__(self) -> None:
+  def __init__(self, config = {}) -> None:
     super().__init__()
+    if 'compress_ratio' in config:
+      compress_ratio = config['compress_ratio']
+    else:
+      compress_ratio = 0.5
     self.config = {
-      'points_count': 30,
-      'points_part': 0.5,
-      'use_points_count': False
+      'compress_ratio': compress_ratio,
     }
 
   def compress(self):
     if len(self.original_data) == 0:
       return
     config = self.config
-    if config['use_points_count']:
-      points_count = config['points_count']
-    else:
-      points_count = round(len(self.original_data) * config['points_part'])
+    points_count = round(len(self.original_data) * config['compress_ratio'])
     if points_count < 1:
       return
     compressed_measurements_set = set()

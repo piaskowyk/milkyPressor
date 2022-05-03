@@ -30,17 +30,17 @@ class CompressPAA(Compressor):
     last_checked_index = 0
     for i in range(chunk_count):
       current_series = []
-      while (i + 1) * chunk_size > self.original_data[last_checked_index].timestamp:
+      while (x_first + (i + 1) * chunk_size) > self.original_data[last_checked_index].timestamp:
         current_series.append(self.original_data[last_checked_index].value)
         last_checked_index += 1
         if last_checked_index >= data_size:
-            stop = True
-            break
+          stop = True
+          break
       if len(current_series) > 0:
         series.append(sum(current_series) / len(current_series))
       if stop:
         break
 
     for i, value in enumerate(series):
-      self.compressed_data.append(Measurement(value, i * chunk_size))
-      self.compressed_data.append(Measurement(value, (i + 1) * chunk_size))
+      self.compressed_data.append(Measurement(value, x_first + i * chunk_size))
+      self.compressed_data.append(Measurement(value, x_first + (i + 1) * chunk_size))

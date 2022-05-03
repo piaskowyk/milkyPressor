@@ -59,5 +59,5 @@ class CompressPAAVI(Compressor):
 
     for i, line in enumerate(series):
       value = sum(line) / len(line)
-      self.compressed_data.append(Measurement(value, i * chunk_size))
-      self.compressed_data.append(Measurement(value, (i + 1) * chunk_size))
+      self.compressed_data.append(Measurement(value, x_first + i * chunk_size))
+      self.compressed_data.append(Measurement(value, x_first + (i + 1) * chunk_size))
