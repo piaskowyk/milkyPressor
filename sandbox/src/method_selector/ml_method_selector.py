@@ -9,27 +9,6 @@ from ..metric import SingleMetric, ComparationMetricEnum, SingleMetricEnum
 from ..method_selector import ClassicMethodSelector
 from ..measurement_provider import MeasurementProvider
 
-"""
-default strategy:
-definiuje tylko jakie metryki mają być użyte, ale compressRatio ma wyższą wagęniż inne metryki, 
-czyli tan na prawdę to jest strategia z wagami
-
-weights strategy:
-każda metryka ma swoją wagę, wynik każdej jest przemnożony przew odpowiednią wagę, 
-potem sumowane wszystko i wybierane maximum
-
-constraint strategy:
-definiuje sobie ograniczenia jakie są na każdą metrykę
-obliczam wszystkie metryki
-sprawdzam które metody spełniają te metryki
-sortuje po compressioni rate i wybieram tą metodę któa skompresowała najbardziej
-
-TODO:
-- dodać więcej metod kompressji z parametrami
-- niektóre parametry mogły by się same obliczać w tych różnych metodach w sumie
-- spróbować znormalizować metryki wszystki, żeby na pewo były z przedzialu [0, 1]
-"""
-
 class StrategyEnum(Enum):
   DEFAULT = 1
   WEIGHTS = 2
