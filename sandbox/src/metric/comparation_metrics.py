@@ -49,6 +49,9 @@ class ComparationMetric:
       'corelation_spearman': lambda original, transformed: self.corelation_spearman_score(original, transformed),
     }
 
+  def get_metrics_count(self) -> int:
+    return len(self.method_invoker)
+
   def _strip_data(self, data: List[Measurement]):
     return [item.value for item in data]
 
@@ -381,7 +384,12 @@ class ComparationMetric:
       result[metric_name] = self.method_invoker[metric_name](original, transformed)
     return result
 
-  def compute_metrics(self, original: List[Measurement], transformed: List[Measurement], metrics: List[ComparationMetricEnum] = None) -> List[float]:
+  def compute_metrics(
+    self, 
+    original: List[Measurement], 
+    transformed: List[Measurement], 
+    metrics: List[ComparationMetricEnum] = None
+  ) -> Dict[str, float]:
     if metrics == None:
       return self.compute_all(original, transformed)
     result = dict()

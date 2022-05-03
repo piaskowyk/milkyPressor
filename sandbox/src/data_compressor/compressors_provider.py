@@ -1,4 +1,4 @@
-from src.data_compressor.other import CompressNTHS, CompressMinMax, CompressPWP
+from src.data_compressor.other import CompressNTHS, CompressMinMax, CompressPWP, NoCompress
 from src.data_compressor.pip import CompressPIP_ED, CompressPIP_PD, CompressPIP_VD
 from src.data_compressor.paa import CompressPAA, CompressPAAVI, CompressByChunk
 from src.data_compressor.pla import CompressAPCADFT, CompressAPCAFFT, CompressSTC, CompressHigherDeriveration
@@ -27,4 +27,6 @@ class CompressorsProvider:
   
   @staticmethod
   def get(compressor_name: str) -> Compressor:
+    if compressor_name == 'NoCompress':
+      return NoCompress()
     return CompressorsProvider.get_compressors()[compressor_name]

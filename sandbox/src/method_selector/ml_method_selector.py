@@ -1,4 +1,5 @@
-from typing import List
+from typing import Dict, List
+from enum import Enum
 from sklearn import tree
 from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
@@ -8,14 +9,43 @@ from ..metric import SingleMetric, ComparationMetricEnum, SingleMetricEnum
 from ..method_selector import ClassicMethodSelector
 from ..measurement_provider import MeasurementProvider
 
+"""
+default strategy:
+definiuje tylko jakie metryki mają być użyte, ale compressRatio ma wyższą wagęniż inne metryki, 
+czyli tan na prawdę to jest strategia z wagami
+
+weights strategy:
+każda metryka ma swoją wagę, wynik każdej jest przemnożony przew odpowiednią wagę, 
+potem sumowane wszystko i wybierane maximum
+
+constraint strategy:
+definiuje sobie ograniczenia jakie są na każdą metrykę
+obliczam wszystkie metryki
+sprawdzam które metody spełniają te metryki
+sortuje po compressioni rate i wybieram tą metodę któa skompresowała najbardziej
+
+TODO:
+- dodać więcej metod kompressji z parametrami
+- niektóre parametry mogły by się same obliczać w tych różnych metodach w sumie
+- spróbować znormalizować metryki wszystki, żeby na pewo były z przedzialu [0, 1]
+"""
+
+class StrategyEnum(Enum):
+  DEFAULT = 1
+  WEIGHTS = 2
+  CONSTRAINTS = 3
+
 class MlMethodSelector:
   def __init__(self) -> None:
     self.measurement_provider: MeasurementProvider = MeasurementProvider()
     self.measurements_set: List[List[Measurement]] = []
     self.single_metrics_container = SingleMetric()
-    self.single_metrics = None
-    self.comparation_metrics = None
+    self.single_metrics: List[SingleMetricEnum] = None
+    self.comparation_metrics: List[ComparationMetricEnum] = None
     self.classifier = None
+    self.weights: Dict[ComparationMetricEnum, float] = dict()
+    self.constraints: Dict[ComparationMetricEnum, float] = dict()
+    self.strategy: StrategyEnum = StrategyEnum.DEFAULT
 
   def set_measurements(self, measurements: List[List[Measurement]] = None):
     if measurements == None:
@@ -23,9 +53,22 @@ class MlMethodSelector:
     else:
       self.measurements_set = measurements
 
-  def set_metrics(self, single_metrics: List[SingleMetricEnum], comparation_metrics: List[ComparationMetricEnum]):
+  def set_single_metrics(self, single_metrics: List[SingleMetricEnum]):
     self.single_metrics = single_metrics
+
+  def set_default_strategy(self, comparation_metrics: List[ComparationMetricEnum]):
+    self.strategy = StrategyEnum.DEFAULT
     self.comparation_metrics = comparation_metrics
+
+  def use_weights_strategy(self, weights: Dict[ComparationMetricEnum, float]):
+    self.strategy = StrategyEnum.WEIGHTS
+    self.comparation_metrics = list(weights.keys())
+    self.weights = weights
+
+  def use_constraint_strategy(self, constraints: Dict[ComparationMetricEnum, float]):
+    self.strategy = StrategyEnum.CONSTRAINTS
+    self.comparation_metrics = list(constraints.keys())
+    self.constraints = constraints
 
   def train(self):
     dataset = self._prepare_dataset()
@@ -37,6 +80,9 @@ class MlMethodSelector:
     self.classifier = classifier.fit(X_train, y_train)
     score = classifier.score(X_test, y_test)
     return score
+
+  def get_classifier(self):
+    return self.classifier
 
   def compress_with_best(self, data: List[Measurement]) -> List[Measurement]:
     single_metrics = self.single_metrics_container.compute_metrics(data, self.single_metrics)
@@ -53,8 +99,14 @@ class MlMethodSelector:
     dataset = []
     for measurements in self.measurements_set:
       classic_method_selector = ClassicMethodSelector()
-      classic_method_selector.set_metrics(self.comparation_metrics)
-      best_method_name = classic_method_selector.get_best(measurements)
+
+      if self.strategy == StrategyEnum.DEFAULT:
+        best_method_name = classic_method_selector.get_best_with_default_strategy(measurements, self.comparation_metrics)
+      elif self.strategy == StrategyEnum.WEIGHTS:
+        best_method_name = classic_method_selector.get_best_with_weights_strategy(measurements, self.weights)
+      else:
+        best_method_name = classic_method_selector.get_best_with_constraint_strategy(measurements, self.constraints)
+
       single_metrics = self.single_metrics_container.compute_metrics(measurements, self.single_metrics)
       input = list(single_metrics.values())
       dataset.append([input, best_method_name])
