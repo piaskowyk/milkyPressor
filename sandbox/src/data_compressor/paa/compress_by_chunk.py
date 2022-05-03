@@ -3,14 +3,16 @@ from src.data_type import Measurement
 
 class CompressByChunk(Compressor):
 
-  def __init__(self) -> None:
+  def __init__(self, config = {}) -> None:
     super().__init__()
+    compress_ratio = config.get('compress_ratio', 0.5)
     self.config = {
-      'chunk_size': 5
+      'compress_ratio': compress_ratio,
     }
 
   def compress(self):
-    chunk_size = self.config['chunk_size']
+    data_size = len(self.original_data)
+    chunk_size = int(data_size * self.config['compress_ratio'])
     if chunk_size < 1:
       return
     chunk: list[Measurement] = []

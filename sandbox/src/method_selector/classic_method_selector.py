@@ -34,7 +34,7 @@ class ClassicMethodSelector:
       compressor.compress()
       compressed_data = compressor.compressed_data
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
-      result[ComparationMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.25
+      result[ComparationMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
       method_metrics_result[name] = result
 
     agregated_metrics = dict()

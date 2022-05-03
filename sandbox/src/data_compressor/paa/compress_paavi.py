@@ -24,7 +24,7 @@ class CompressPAAVI(Compressor):
     if data_size < 2:
       self.compressed_data = self.original_data[:]
       return
-    chunk_count = data_size * self.config['compress_ratio']
+    chunk_count = int(data_size * self.config['compress_ratio'])
     x_first = self.original_data[0].timestamp
     x_last = self.original_data[data_size - 1].timestamp
 

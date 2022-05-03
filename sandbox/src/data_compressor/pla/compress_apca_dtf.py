@@ -9,10 +9,11 @@ class CompressAPCADFT(Compressor):
 
   PI = 3.14159265359
 
-  def __init__(self) -> None:
+  def __init__(self, config = {}) -> None:
     super().__init__()
+    compress_ratio = config.get('compress_ratio', 0.5)
     self.config = {
-      'compress_ratio': 0.5
+      'compress_ratio': compress_ratio
     }
     self.compressor = CompressAPCAFT()
     self.compressor.set_ft_function(self._ft_function)

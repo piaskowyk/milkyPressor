@@ -9,13 +9,16 @@ class CompressorsProvider:
 
   @staticmethod
   def get_compressors() -> Dict[str, Compressor]:
-    compressors = {
-      'CompressByChunk': CompressByChunk(),
-      'CompressAPCADFT': CompressAPCADFT(),
-      'CompressAPCAFFT': CompressAPCAFFT(),
-      'CompressSTC': CompressSTC(),
-      'CompressHigherDeriveration': CompressHigherDeriveration(),
-    }
+    compressors = {}
+
+    for slope_angle in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]:
+      compressors[f'CompressSTC_{slope_angle}'] = CompressSTC({'slope_angle': slope_angle})
+
+    for deriveration_factor in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]:
+      compressors[f'CompressHigherDeriveration_{slope_angle}'] = CompressHigherDeriveration(
+        {'deriveration_factor': deriveration_factor}
+      )
+    
     generator = [
       ('CompressNTHS', CompressNTHS),
       ('CompressMinMax', CompressMinMax),
@@ -25,10 +28,13 @@ class CompressorsProvider:
       ('CompressPIP_VD', CompressPIP_VD),
       ('CompressPAA', CompressPAA),
       ('CompressPAAVI', CompressPAAVI),
+      ('CompressByChunk', CompressPAAVI),
+      ('CompressAPCADFT', CompressAPCADFT),
+      ('CompressAPCAFFT', CompressAPCAFFT),
     ]
     for name, class_ in generator:
       for compress_ratio in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        compressors[name] = class_({'compress_ratio': compress_ratio})
+        compressors[f'{name}_{compress_ratio}'] = class_({'compress_ratio': compress_ratio})
     return compressors
   
   @staticmethod
