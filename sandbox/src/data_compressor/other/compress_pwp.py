@@ -7,10 +7,7 @@ class CompressPWP(Compressor):
 
   def __init__(self, config = {}) -> None:
     super().__init__()
-    if 'compress_ratio' in config:
-      compress_ratio = config['compress_ratio']
-    else:
-      compress_ratio = 0.5
+    compress_ratio = config.get('compress_ratio', 0.5)
     self.config = {
       'probability': compress_ratio
     }

@@ -6,11 +6,11 @@ from src.data_type import Measurement
 # kais_2000.pdf https://jmotif.github.io/sax-vsm_site/morea/algorithm/PAA.html
 class CompressPAA(Compressor):
 
-  def __init__(self) -> None:
+  def __init__(self, config = {}) -> None:
     super().__init__()
+    compress_ratio = config.get('compress_ratio', 0.5)
     self.config = {
-      'chunk_count': 10,
-      'compress_ratio': 0.5,
+      'compress_ratio': compress_ratio,
     }
 
   def compress(self):
@@ -18,9 +18,7 @@ class CompressPAA(Compressor):
     if data_size < 2:
       self.compressed_data = self.original_data[:]
       return
-    chunk_count = self.config['chunk_count']
-    if not chunk_count:
-      chunk_count = data_size * self.config['compress_ratio']
+    chunk_count = data_size * self.config['compress_ratio']
     x_first = self.original_data[0].timestamp
     x_last = self.original_data[data_size - 1].timestamp
     chunk_size = (x_last - x_first) / chunk_count

@@ -6,10 +6,11 @@ from .compress_pip import CompressPIP
 # PIP-PD - perceptual interesting points, perpendicular distance
 class CompressPIP_PD(Compressor):
 
-  def __init__(self) -> None:
+  def __init__(self, config = {}) -> None:
     super().__init__()
+    compress_ratio = config.get('compress_ratio', 0.5)
     self.config = {
-      'compress_ratio': 0.5
+      'compress_ratio': compress_ratio
     }
     self.compressor = CompressPIP()
     self.compressor.set_metric(self._perpendicular_distance)
