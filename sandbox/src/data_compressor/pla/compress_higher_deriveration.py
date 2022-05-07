@@ -1,3 +1,4 @@
+from src.data_type import Measurement
 from src.data_compressor.compressor import Compressor
 
 class CompressHigherDeriveration(Compressor):
@@ -19,9 +20,15 @@ class CompressHigherDeriveration(Compressor):
         max_value = measurement.value
       if measurement.value < min_value:
         min_value = measurement.value
-    deriveration = self.config['deriveration_factor']
+    deriveration = abs(min_value - max_value) * self.config['deriveration_factor']
+    self.compressed_data.append(Measurement(self.original_data[0].value, self.original_data[0].timestamp))
     last_measurement_value = self.original_data[0].value
     for measurement in self.original_data:
       if abs(last_measurement_value - measurement.value) > deriveration:
         self.compressed_data.append(measurement)
         last_measurement_value = measurement.value
+
+    last_original = self.original_data[len(self.original_data) - 1]
+    last_compressed = self.compressed_data[len(self.compressed_data) - 1]
+    if last_original.timestamp != last_compressed.timestamp:
+      self.compressed_data.append(Measurement(last_original.value, last_original.timestamp))

@@ -10,11 +10,11 @@ model_generator.set_single_metrics([
 ])
 model_generator.add_custom_feature_metric(lambda data: 0.5)
 
-# model_generator.use_default_strategy([
-#   ComparationMetricEnum.arithmetic_average,
-#   ComparationMetricEnum.median,
-#   ComparationMetricEnum.min_max_diff,
-# ])
+model_generator.use_default_strategy([
+  ComparationMetricEnum.arithmetic_average,
+  ComparationMetricEnum.median,
+  ComparationMetricEnum.min_max_diff,
+])
 # model_generator.add_custom_comparation_metric(lambda original, compressed: 0.5)
 
 # model_generator.use_weights_strategy({

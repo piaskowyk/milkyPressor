@@ -38,6 +38,8 @@ class ClassicMethodSelector:
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data
+      if len(compressed_data) == 0:
+        print(name)
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
       for index, custom_metric in enumerate(custom_metrics):
         result[f'custom_{index}'] = custom_metric(data, compressed_data)

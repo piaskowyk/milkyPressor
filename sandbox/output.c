@@ -15,5 +15,40 @@
 */
 
 int classifier(double * x){
-  return NoCompress;
+  if (x[1] <= 0.0132601527) {
+    if (x[1] <= 0.0094882352) {
+      if (x[2] <= -2.0584602356) {
+        return CompressPIP_PD_0.2;
+      }
+      else {
+        return CompressPIP_VD_0.2;
+      }
+    }
+    else {
+      if (x[1] <= 0.0104780667) {
+        return CompressMinMax_0.1;
+      }
+      else {
+        if (x[1] <= 0.0109610641) {
+          return CompressPWP_0.3;
+        }
+        else {
+          return CompressMinMax_0.1;
+        }
+      }
+    }
+  }
+  else {
+    if (x[1] <= 0.0154281938) {
+      return CompressPIP_PD_0.1;
+    }
+    else {
+      if (x[1] <= 0.0185973477) {
+        return CompressMinMax_0.2;
+      }
+      else {
+        return CompressPIP_ED_0.1;
+      }
+    }
+  }
 };
