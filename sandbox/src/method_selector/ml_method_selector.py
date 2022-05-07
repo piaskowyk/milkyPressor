@@ -5,7 +5,7 @@ from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
 
 from ..data_type import Measurement
-from ..metric import SingleMetric, ComparationMetricEnum, SingleMetricEnum
+from ..metric import FeatureMetric, ComparationMetricEnum, FeatureMetricEnum
 from ..method_selector import ClassicMethodSelector
 from ..measurement_provider import MeasurementProvider
 
@@ -18,8 +18,8 @@ class MlMethodSelector:
   def __init__(self) -> None:
     self.measurement_provider: MeasurementProvider = MeasurementProvider()
     self.measurements_set: List[List[Measurement]] = []
-    self.single_metrics_container = SingleMetric()
-    self.single_metrics: List[SingleMetricEnum] = None
+    self.feature_metrics_container = FeatureMetric()
+    self.single_metrics: List[FeatureMetricEnum] = None
     self.comparation_metrics: List[ComparationMetricEnum] = None
     self.classifier = None
     self.weights: Dict[ComparationMetricEnum, float] = dict()
@@ -32,10 +32,10 @@ class MlMethodSelector:
     else:
       self.measurements_set = measurements
 
-  def set_single_metrics(self, single_metrics: List[SingleMetricEnum]):
+  def set_single_metrics(self, single_metrics: List[FeatureMetricEnum]):
     self.single_metrics = single_metrics
 
-  def set_default_strategy(self, comparation_metrics: List[ComparationMetricEnum]):
+  def use_default_strategy(self, comparation_metrics: List[ComparationMetricEnum]):
     self.strategy = StrategyEnum.DEFAULT
     self.comparation_metrics = comparation_metrics
 
@@ -64,7 +64,7 @@ class MlMethodSelector:
     return self.classifier
 
   def compress_with_best(self, data: List[Measurement]) -> List[Measurement]:
-    single_metrics = self.single_metrics_container.compute_metrics(data, self.single_metrics)
+    single_metrics = self.feature_metrics_container.compute_metrics(data, self.single_metrics)
     input = list(single_metrics.values())
     best_method_name = self.classifier.predict([input])[0]
     compressor: Compressor = CompressorsProvider.get(best_method_name)
@@ -86,7 +86,19 @@ class MlMethodSelector:
       else:
         best_method_name = classic_method_selector.get_best_with_constraint_strategy(measurements, self.constraints)
 
-      single_metrics = self.single_metrics_container.compute_metrics(measurements, self.single_metrics)
+      single_metrics = self.feature_metrics_container.compute_metrics(measurements, self.single_metrics)
       input = list(single_metrics.values())
       dataset.append([input, best_method_name])
     return dataset
+
+  def add_custom_feature_metric(self, metric_function):
+    pass
+
+  def add_custom_comparation_metric(self, metric_function):
+    pass
+
+  def add_custom_comparation_metric_with_weight(self, metric_function, weight: float):
+    pass
+
+  def add_custom_comparation_metric_with_constraint(self, metric_function, constraint: float):
+    pass

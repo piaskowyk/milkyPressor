@@ -6,7 +6,7 @@ import numpy as np
 import statistics
 from src.data_type import Measurement
 
-class SingleMetricEnum(Enum):
+class FeatureMetricEnum(Enum):
   arithmetic_average = 'arithmetic_average'
   standard_derivative = 'standard_derivative'
   function_field = 'function_field'
@@ -24,7 +24,7 @@ class SingleMetricEnum(Enum):
   corelation_pearson = 'corelation_pearson'
   corelation_spearman = 'corelation_spearman'
   
-class SingleMetric:
+class FeatureMetric:
 
   def _strip_data(self, data: List[Measurement]):
     return [item.value for item in data]
@@ -357,7 +357,7 @@ class SingleMetric:
       'corelation_spearman': corelation_spearman,
     }
 
-  def compute_metrics(self, data: List[Measurement], metrics: List[SingleMetricEnum] = None) -> List[float]:
+  def compute_metrics(self, data: List[Measurement], metrics: List[FeatureMetricEnum] = None) -> List[float]:
     all_metrics = self.compute_all(data)
     if metrics == None:
       return all_metrics
