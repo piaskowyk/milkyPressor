@@ -5,7 +5,7 @@ from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
 
 from ..data_type import Measurement
-from ..metric import FeatureMetric, ComparationMetricEnum, FeatureMetricEnum
+from ..metric import FeatureMetric, SimilarityMetricEnum, FeatureMetricEnum
 from ..method_selector import ClassicMethodSelector
 from ..measurement_provider import MeasurementProvider
 
@@ -20,10 +20,10 @@ class MlMethodSelector:
     self.measurements_set: List[List[Measurement]] = []
     self.feature_metrics_container = FeatureMetric()
     self.single_metrics: List[FeatureMetricEnum] = None
-    self.comparation_metrics: List[ComparationMetricEnum] = None
+    self.comparation_metrics: List[SimilarityMetricEnum] = None
     self.classifier = None
-    self.weights: Dict[ComparationMetricEnum, float] = dict()
-    self.constraints: Dict[ComparationMetricEnum, float] = dict()
+    self.weights: Dict[SimilarityMetricEnum, float] = dict()
+    self.constraints: Dict[SimilarityMetricEnum, float] = dict()
     self.strategy: StrategyEnum = StrategyEnum.DEFAULT
     self.custom_feature_metric: List[Callable[[List[Measurement]], float]] = []
     self.custom_comparation_metric: List[Callable[[List[Measurement]], float]] = []
@@ -39,16 +39,16 @@ class MlMethodSelector:
   def set_single_metrics(self, single_metrics: List[FeatureMetricEnum]):
     self.single_metrics = single_metrics
 
-  def use_default_strategy(self, comparation_metrics: List[ComparationMetricEnum]):
+  def use_default_strategy(self, comparation_metrics: List[SimilarityMetricEnum]):
     self.strategy = StrategyEnum.DEFAULT
     self.comparation_metrics = comparation_metrics
 
-  def use_weights_strategy(self, weights: Dict[ComparationMetricEnum, float]):
+  def use_weights_strategy(self, weights: Dict[SimilarityMetricEnum, float]):
     self.strategy = StrategyEnum.WEIGHTS
     self.comparation_metrics = list(weights.keys())
     self.weights = weights
 
-  def use_constraint_strategy(self, constraints: Dict[ComparationMetricEnum, float]):
+  def use_constraint_strategy(self, constraints: Dict[SimilarityMetricEnum, float]):
     self.strategy = StrategyEnum.CONSTRAINTS
     self.comparation_metrics = list(constraints.keys())
     self.constraints = constraints

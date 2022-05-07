@@ -6,7 +6,7 @@ import numpy as np
 import statistics
 from src.data_type import Measurement
 
-class ComparationMetricEnum(Enum):
+class SimilarityMetricEnum(Enum):
   compression_rate = 'compression_rate'
   sum_differences = 'sum_differences'
   arithmetic_average = 'arithmetic_average'
@@ -26,7 +26,7 @@ class ComparationMetricEnum(Enum):
   corelation_pearson = 'corelation_pearson'
   corelation_spearman = 'corelation_spearman'
 
-class ComparationMetric:
+class SimilarityMetric:
   def __init__(self) -> None:
     self.method_invoker = {
       'compression_rate': lambda original, transformed: self.compression_ratio_score(original, transformed),
@@ -388,7 +388,7 @@ class ComparationMetric:
     self, 
     original: List[Measurement], 
     transformed: List[Measurement], 
-    metrics: List[ComparationMetricEnum] = None
+    metrics: List[SimilarityMetricEnum] = None
   ) -> Dict[str, float]:
     if metrics == None:
       return self.compute_all(original, transformed)

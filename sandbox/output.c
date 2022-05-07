@@ -15,39 +15,39 @@
 */
 
 int classifier(double * x){
-  if (x[1] <= 0.0132601527) {
-    if (x[1] <= 0.0094882352) {
-      if (x[2] <= -2.0584602356) {
-        return CompressPIP_PD_0.2;
-      }
-      else {
-        return CompressPIP_VD_0.2;
-      }
+  if (x[1] <= 0.0109456773) {
+    if (x[1] <= 0.0049999999) {
+      return CompressPIP_ED_0.3;
     }
     else {
-      if (x[1] <= 0.0104780667) {
-        return CompressMinMax_0.1;
-      }
-      else {
-        if (x[1] <= 0.0109610641) {
-          return CompressPWP_0.3;
-        }
-        else {
-          return CompressMinMax_0.1;
-        }
-      }
+      return CompressMinMax_0.1;
     }
   }
   else {
-    if (x[1] <= 0.0154281938) {
-      return CompressPIP_PD_0.1;
+    if (x[2] <= -2.2277358174) {
+      return CompressPIP_ED_0.4;
     }
     else {
-      if (x[1] <= 0.0185973477) {
-        return CompressMinMax_0.2;
+      if (x[1] <= 0.0126595069) {
+        return CompressPIP_PD_0.1;
       }
       else {
-        return CompressPIP_ED_0.1;
+        if (x[1] <= 0.0137926689) {
+          return CompressPIP_VD_0.1;
+        }
+        else {
+          if (x[2] <= -1.6027950048) {
+            return CompressPIP_ED_0.3;
+          }
+          else {
+            if (x[2] <= -0.7079290533) {
+              return CompressPIP_ED_0.5;
+            }
+            else {
+              return CompressMinMax_0.2;
+            }
+          }
+        }
       }
     }
   }
