@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Callable, Tuple
 from enum import Enum
 from sklearn import tree
 from src.data_compressor.compressor import Compressor
@@ -25,6 +25,10 @@ class MlMethodSelector:
     self.weights: Dict[ComparationMetricEnum, float] = dict()
     self.constraints: Dict[ComparationMetricEnum, float] = dict()
     self.strategy: StrategyEnum = StrategyEnum.DEFAULT
+    self.custom_feature_metric: List[Callable[[List[Measurement]], float]] = []
+    self.custom_comparation_metric: List[Callable[[List[Measurement]], float]] = []
+    self.custom_comparation_metric_with_weight: List[Tuple[Callable[[List[Measurement]], float], float]] = []
+    self.custom_comparation_metric_with_constraint: List[Tuple[Callable[[List[Measurement]], float], float]] = []
 
   def set_measurements(self, measurements: List[List[Measurement]] = None):
     if measurements == None:
@@ -80,25 +84,41 @@ class MlMethodSelector:
       classic_method_selector = ClassicMethodSelector()
 
       if self.strategy == StrategyEnum.DEFAULT:
-        best_method_name = classic_method_selector.get_best_with_default_strategy(measurements, self.comparation_metrics)
+        best_method_name = classic_method_selector.get_best_with_default_strategy(
+          measurements, 
+          self.comparation_metrics,
+          self.custom_comparation_metric
+        )
       elif self.strategy == StrategyEnum.WEIGHTS:
-        best_method_name = classic_method_selector.get_best_with_weights_strategy(measurements, self.weights)
+        best_method_name = classic_method_selector.get_best_with_weights_strategy(
+          measurements, 
+          self.weights,
+          self.custom_comparation_metric_with_weight
+        )
       else:
-        best_method_name = classic_method_selector.get_best_with_constraint_strategy(measurements, self.constraints)
+        best_method_name = classic_method_selector.get_best_with_constraint_strategy(
+          measurements, 
+          self.constraints,
+          self.custom_comparation_metric_with_constraint
+        )
 
-      single_metrics = self.feature_metrics_container.compute_metrics(measurements, self.single_metrics)
+      single_metrics = self.feature_metrics_container.compute_metrics(
+        measurements, 
+        self.single_metrics,
+        self.custom_feature_metric
+      )
       input = list(single_metrics.values())
       dataset.append([input, best_method_name])
     return dataset
 
-  def add_custom_feature_metric(self, metric_function):
-    pass
+  def add_custom_feature_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
+    self.custom_feature_metric.append(metric_function)
 
-  def add_custom_comparation_metric(self, metric_function):
-    pass
+  def add_custom_comparation_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
+    self.custom_comparation_metric.append(metric_function)
 
-  def add_custom_comparation_metric_with_weight(self, metric_function, weight: float):
-    pass
+  def add_custom_comparation_metric_with_weight(self, metric_function: Callable[[List[Measurement]], float], weight: float) -> None:
+    self.custom_comparation_metric_with_weight.append((metric_function, weight))
 
-  def add_custom_comparation_metric_with_constraint(self, metric_function, constraint: float):
-    pass
+  def add_custom_comparation_metric_with_constraint(self, metric_function: Callable[[List[Measurement]], float], constraint: float) -> None:
+    self.custom_comparation_metric_with_constraint.append((metric_function, constraint))

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Callable
 from fogml.generators import GeneratorFactory
 from .metric import ComparationMetricEnum, FeatureMetricEnum
 from .data_type import Measurement
@@ -31,14 +31,22 @@ class ModelGenerator:
     generator.generate(fname='output.c')
     return score
 
-  def add_custom_feature_metric(self, metric_function) -> None:
+  def add_custom_feature_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
     self.ml_method_selector.add_custom_feature_metric(metric_function)
 
-  def add_custom_comparation_metric(self, metric_function) -> None:
+  def add_custom_comparation_metric(self, metric_function: Callable[[List[Measurement], List[Measurement]], float]) -> None:
     self.ml_method_selector.add_custom_comparation_metric(metric_function)
 
-  def add_custom_comparation_metric_with_weight(self, metric_function) -> None:
-    self.ml_method_selector.add_custom_comparation_metric_with_weight(metric_function)
+  def add_custom_comparation_metric_with_weight(
+      self, 
+      metric_function: Callable[[List[Measurement], List[Measurement]], float],
+      weight: float
+    ) -> None:
+    self.ml_method_selector.add_custom_comparation_metric_with_weight(metric_function, weight)
 
-  def add_custom_comparation_metric_with_constraint(self, metric_function) -> None:
-    self.ml_method_selector.add_custom_comparation_metric_with_constraint(metric_function)
+  def add_custom_comparation_metric_with_constraint(
+      self, 
+      metric_function: Callable[[List[Measurement], List[Measurement]], float],
+      constraint: float
+    ) -> None:
+    self.ml_method_selector.add_custom_comparation_metric_with_constraint(metric_function, constraint)

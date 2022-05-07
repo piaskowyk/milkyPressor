@@ -396,4 +396,3 @@ class ComparationMetric:
     for metric_name in metrics:
       result[metric_name.value] = self.method_invoker[metric_name.value](original, transformed)
     return result
-    

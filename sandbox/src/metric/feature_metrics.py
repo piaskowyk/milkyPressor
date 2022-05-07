@@ -1,7 +1,7 @@
 from enum import Enum
 import math
 import matplotlib.pyplot as plt
-from typing import Tuple, Any, List
+from typing import Dict, Tuple, Any, List, Callable
 import numpy as np
 import statistics
 from src.data_type import Measurement
@@ -319,7 +319,7 @@ class FeatureMetric:
     else:
       return a / b
 
-  def compute_all(self, data: List[Measurement]) -> List[float]:
+  def compute_all(self, data: List[Measurement]) -> Dict[str, float]:
     data_count = self.data_count(data)
     sum_value = self.sum_value(data)
     min_value = self.min_value(data)
@@ -357,11 +357,29 @@ class FeatureMetric:
       'corelation_spearman': corelation_spearman,
     }
 
-  def compute_metrics(self, data: List[Measurement], metrics: List[FeatureMetricEnum] = None) -> List[float]:
+  def compute_metrics(
+      self, 
+      data: List[Measurement], 
+      metrics: List[FeatureMetricEnum] = None, 
+      custom_metrics: List[Callable[[List[Measurement]], float]] = []
+    ) -> Dict[str, float]:
+    customs = self._compute_custom(data, custom_metrics)
     all_metrics = self.compute_all(data)
     if metrics == None:
+      all_metrics.update(customs)
       return all_metrics
     result = dict()
     for metric_name in metrics:
       result[metric_name.value] = all_metrics[metric_name.value]
+    result.update(customs)
+    return result
+
+  def _compute_custom(
+      self, 
+      data: List[Measurement], 
+      custom_metrics: List[Callable[[List[Measurement]], float]]
+    ) -> Dict[str, float]:
+    result = dict()
+    for index, metric in enumerate(custom_metrics):
+      result[f'custom_{index}'] = metric(data)
     return result

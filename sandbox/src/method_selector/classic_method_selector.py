@@ -3,7 +3,7 @@ from ..metric import ComparationMetricEnum
 from src.metric import ComparationMetric
 from src.data_type import Measurement
 from src.data_compressor.compressor import Compressor
-from typing import List, Dict
+from typing import List, Dict, Callable, Tuple
 from collections import defaultdict as dict
 
 class ClassicMethodSelector:
@@ -19,7 +19,12 @@ class ClassicMethodSelector:
       for name, value in metrics.items():
         print(f"\t{name}:\t{value}")
 
-  def get_best_with_default_strategy(self, data: List[Measurement], comparation_metrics: List[ComparationMetricEnum]) -> str:
+  def get_best_with_default_strategy(
+      self, 
+      data: List[Measurement], 
+      comparation_metrics: List[ComparationMetricEnum],
+      custom_metrics: List[Callable[[List[Measurement], List[Measurement]], float]]
+    ) -> str:
     method_metrics_result = dict()
     if comparation_metrics != None:
       comparation_metrics_count = len(comparation_metrics)
@@ -34,6 +39,8 @@ class ClassicMethodSelector:
       compressor.compress()
       compressed_data = compressor.compressed_data
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
+      for index, custom_metric in enumerate(custom_metrics):
+        result[f'custom_{index}'] = custom_metric(data, compressed_data)
       result[ComparationMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
       method_metrics_result[name] = result
 
@@ -44,7 +51,12 @@ class ClassicMethodSelector:
     best_method_name, _ = sorted_methods[0]
     return best_method_name
 
-  def get_best_with_weights_strategy(self, data: List[Measurement], weights: Dict[ComparationMetricEnum, float]) -> str:
+  def get_best_with_weights_strategy(
+      self, 
+      data: List[Measurement], 
+      weights: Dict[ComparationMetricEnum, float],
+      custom_metrics: List[Tuple[Callable[[List[Measurement], List[Measurement]], float], float]]
+    ) -> str:
     method_metrics_result = dict()
     comparation_metrics = list(weights.keys())
 
@@ -55,6 +67,9 @@ class ClassicMethodSelector:
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
       for metric_name, weight in weights.items():
         result[metric_name.value] *= weight
+      for index, custom_metric_with_weight in enumerate(custom_metrics):
+        custom_metric, weight = custom_metric_with_weight
+        result[f'custom_{index}'] = custom_metric(data, compressed_data) * weight
       method_metrics_result[name] = result
     
     agregated_metrics = dict()
@@ -64,7 +79,12 @@ class ClassicMethodSelector:
     best_method_name, _ = sorted_methods[0]
     return best_method_name
 
-  def get_best_with_constraint_strategy(self, data: List[Measurement], constraints: Dict[ComparationMetricEnum, float]) -> str:
+  def get_best_with_constraint_strategy(
+      self, 
+      data: List[Measurement], 
+      constraints: Dict[ComparationMetricEnum, float],
+      custom_metrics: List[Tuple[Callable[[List[Measurement], List[Measurement]], float], float]]
+    ) -> str:
     method_metrics_result = dict()
     comparation_metrics = list(constraints.keys())
     if ComparationMetricEnum.compression_rate not in comparation_metrics:
@@ -78,6 +98,13 @@ class ClassicMethodSelector:
       pass_limits = True
       for metrics_name, constraint in constraints.items():
         if result[metrics_name.value] < constraint:
+          pass_limits = False
+          break
+      for index, custom_metric_with_constraint in enumerate(custom_metrics):
+        custom_metric, constraint = custom_metric_with_constraint
+        metric_value = custom_metric(data, compressed_data)
+        result[f'custom_{index}'] = metric_value
+        if metric_value < constraint:
           pass_limits = False
           break
       if pass_limits:

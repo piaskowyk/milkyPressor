@@ -15,45 +15,5 @@
 */
 
 int classifier(double * x){
-  if (x[1] <= 0.0101689459) {
-    if (x[2] <= -3.3597506285) {
-      return CompressPAA;
-    }
-    else {
-      if (x[1] <= 0.0094248354) {
-        return CompressNTHS;
-      }
-      else {
-        if (x[2] <= -0.8680301905) {
-          return CompressNTHS;
-        }
-        else {
-          return CompressByChunk;
-        }
-      }
-    }
-  }
-  else {
-    if (x[2] <= -1.5283702016) {
-      if (x[2] <= -1.5675927401) {
-        return CompressPAAVI;
-      }
-      else {
-        return CompressMinMax;
-      }
-    }
-    else {
-      if (x[2] <= -0.7599598598) {
-        return CompressByChunk;
-      }
-      else {
-        if (x[1] <= 0.0138551458) {
-          return CompressAPCADFT;
-        }
-        else {
-          return CompressByChunk;
-        }
-      }
-    }
-  }
+  return NoCompress;
 };
