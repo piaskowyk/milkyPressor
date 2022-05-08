@@ -68,7 +68,11 @@ class MlMethodSelector:
     return self.classifier
 
   def compress_with_best(self, data: List[Measurement]) -> List[Measurement]:
-    single_metrics = self.feature_metrics_container.compute_metrics(data, self.single_metrics)
+    single_metrics = self.feature_metrics_container.compute_metrics(
+      data, 
+      self.single_metrics,
+      self.custom_feature_metric
+    )
     input = list(single_metrics.values())
     best_method_name = self.classifier.predict([input])[0]
     compressor: Compressor = CompressorsProvider.get(best_method_name)
