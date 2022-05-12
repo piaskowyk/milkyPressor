@@ -15,23 +15,23 @@ model_generator.use_default_strategy([
   SimilarityMetricEnum.median,
   SimilarityMetricEnum.min_max_diff,
 ])
-# model_generator.add_custom_comparation_metric(lambda original, compressed: 0.5)
+model_generator.add_custom_similarity_metric(lambda original, compressed: 0.5)
 
 # model_generator.use_weights_strategy({
-#   ComparationMetricEnum.compression_rate: 5,
-#   ComparationMetricEnum.arithmetic_average: 2,
-#   ComparationMetricEnum.median: 3,
-#   ComparationMetricEnum.min_max_diff: 1.5,
+#   SimilarityMetricEnum.compression_rate: 5,
+#   SimilarityMetricEnum.arithmetic_average: 2,
+#   SimilarityMetricEnum.median: 3,
+#   SimilarityMetricEnum.min_max_diff: 1.5,
 # })
-# model_generator.add_custom_comparation_metric_with_weight(lambda original, compressed: 0.5, 1)
+# model_generator.add_custom_similarity_metric_with_weight(lambda original, compressed: 0.5, 1)
 
 # model_generator.use_constraint_strategy({
-#   ComparationMetricEnum.compression_rate: 5,
-#   ComparationMetricEnum.arithmetic_average: 2,
-#   ComparationMetricEnum.median: 3,
-#   ComparationMetricEnum.min_max_diff: 1.5,
+#   SimilarityMetricEnum.compression_rate: 5,
+#   SimilarityMetricEnum.arithmetic_average: 2,
+#   SimilarityMetricEnum.median: 3,
+#   SimilarityMetricEnum.min_max_diff: 1.5,
 # })
-# model_generator.add_custom_comparation_metric_with_constraint(lambda original, compressed: 0.5, 0.6)
+# model_generator.add_custom_similarity_metric_with_constraint(lambda original, compressed: 0.5, 0.6)
 
 score = model_generator.build()
 print(f'score: {score}')

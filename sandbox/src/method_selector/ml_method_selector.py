@@ -118,11 +118,11 @@ class MlMethodSelector:
   def add_custom_feature_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
     self.custom_feature_metric.append(metric_function)
 
-  def add_custom_comparation_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
+  def add_custom_similarity_metric(self, metric_function: Callable[[List[Measurement]], float]) -> None:
     self.custom_comparation_metric.append(metric_function)
 
-  def add_custom_comparation_metric_with_weight(self, metric_function: Callable[[List[Measurement]], float], weight: float) -> None:
+  def add_custom_similarity_metric_with_weight(self, metric_function: Callable[[List[Measurement]], float], weight: float) -> None:
     self.custom_comparation_metric_with_weight.append((metric_function, weight))
 
-  def add_custom_comparation_metric_with_constraint(self, metric_function: Callable[[List[Measurement]], float], constraint: float) -> None:
+  def add_custom_similarity_metric_with_constraint(self, metric_function: Callable[[List[Measurement]], float], constraint: float) -> None:
     self.custom_comparation_metric_with_constraint.append((metric_function, constraint))
