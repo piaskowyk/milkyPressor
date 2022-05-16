@@ -11,7 +11,7 @@ class Compressor:
     self.compressed_data: List[Measurement] = []
     self.config = {}
 
-  def compress(self):
+  def compress(self) -> None:
     raise "Unimplement method"
 
   def push(self, measurement: Measurement):

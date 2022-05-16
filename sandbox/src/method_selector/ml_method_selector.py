@@ -1,5 +1,6 @@
 from typing import Dict, List, Callable, Tuple
 from enum import Enum
+from src.metric.similarity_metrics import SimilarityMetric
 from sklearn import tree
 from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
@@ -19,6 +20,7 @@ class MlMethodSelector:
     self.measurement_provider: MeasurementProvider = MeasurementProvider()
     self.measurements_set: List[List[Measurement]] = []
     self.feature_metrics_container = FeatureMetric()
+    self.similarity_metrics_container = SimilarityMetric()
     self.single_metrics: List[FeatureMetricEnum] = None
     self.comparation_metrics: List[SimilarityMetricEnum] = None
     self.classifier = None
@@ -78,9 +80,10 @@ class MlMethodSelector:
     compressor: Compressor = CompressorsProvider.get(best_method_name)
     compressor.set_data(data)
     compressor.compress()
+    compression_metrics = self.similarity_metrics_container.compute_all(data, compressor.compressed_data)
     stats = compressor.get_stats()
     stats['method_name'] = best_method_name
-    return compressor.compressed_data, stats
+    return compressor.compressed_data, stats, list(compression_metrics.values())
 
   def _prepare_dataset(self):
     dataset = []
