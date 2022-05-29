@@ -29,6 +29,22 @@ class MeasurementProvider:
     ]
     return [self.to_measurements(signal_generator) for signal_generator in signal_generators]
 
+  def get_random2(self) -> List[List[Measurement]]:
+    size = 1000
+    signal_generators = [
+      SignalGenerator(0, size).with_peaks(3).with_peaks(3, direction=-1).sin(0.2, 0.2),
+      SignalGenerator(0, size).with_peaks(3).with_peaks(3, direction=-1).noise(),
+      SignalGenerator(0, size).with_peaks(3).noise(),
+      SignalGenerator(0, size).with_peaks(3),
+      SignalGenerator(0, size).square_vawe(),
+      SignalGenerator(0, size).square_vawe().with_peaks(5),
+      SignalGenerator(0, size).square_vawe().with_peaks(5).sin(),
+      SignalGenerator(0, size).square_vawe().with_peaks(5).sin().noise(),
+      SignalGenerator(0, size).square_vawe().with_peaks(5).sin(100).noise(),
+      SignalGenerator(0, size).square_vawe().with_peaks(50).noise(),
+    ]
+    return [self.to_measurements(signal_generator) for signal_generator in signal_generators]
+
   def json_to_measurements(self, path: str):
     result = []
     with open(f'../datasets/parsed/{path}', 'r') as file:

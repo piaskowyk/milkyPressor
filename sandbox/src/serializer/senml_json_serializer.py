@@ -3,7 +3,7 @@ from src.data_type import Measurement
 import json
 
 class SenMLJSONSerializer:
-  def serialize(self, measurements: List[Measurement], bn_value: str, n_value: str, metrics: List[float]) -> str:
+  def serialize(measurements: List[Measurement], bn_value: str, n_value: str, metrics: List[float]) -> str:
     output = []
     values = [m.value for m in measurements]
     timestamps = [m.timestamp for m in measurements]

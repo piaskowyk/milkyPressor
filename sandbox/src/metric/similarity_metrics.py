@@ -49,6 +49,9 @@ class SimilarityMetric:
       'corelation_spearman': lambda original, transformed: self.corelation_spearman_score(original, transformed),
     }
 
+  def get_all_metric_list(self):
+    return [item for item in SimilarityMetricEnum];
+
   def get_metrics_count(self) -> int:
     return len(self.method_invoker)
 
@@ -318,9 +321,10 @@ class SimilarityMetric:
     return sum_distance * 1/n
 
   def covariance_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_covariance = self._covariance(x_list, self._strip_data(original))
-    transformed_covariance = self._covariance(x_list, self._strip_data(transformed))
+    x_list_original = [i for i in range(len(original))]
+    x_list_transformed = [i for i in range(len(transformed))]
+    original_covariance = self._covariance(x_list_original, self._strip_data(original))
+    transformed_covariance = self._covariance(x_list_transformed, self._strip_data(transformed))
     return self._cacl_score(original_covariance, transformed_covariance)
 
   def _corelation_pearson(self, x: List[float], y: List[float]) -> float:
@@ -341,9 +345,10 @@ class SimilarityMetric:
     return sum_distance / distance_sqrt
 
   def corelation_pearson_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_corelation = self._corelation_pearson(x_list, self._strip_data(original))
-    transformed_corelation = self._corelation_pearson(x_list, self._strip_data(transformed))
+    x_list_original = [i for i in range(len(original))]
+    x_list_transformed = [i for i in range(len(transformed))]
+    original_corelation = self._corelation_pearson(x_list_original, self._strip_data(original))
+    transformed_corelation = self._corelation_pearson(x_list_transformed, self._strip_data(transformed))
     return self._cacl_score(original_corelation, transformed_corelation)
 
   def _corelation_spearman_on_injection(self, x: List[float], y: List[float]) -> float:
@@ -370,9 +375,10 @@ class SimilarityMetric:
     return 1 - ((6 * distance_sum) / (n * (n ** 2 - 1)))
 
   def corelation_spearman_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    x_list = [i for i in range(len(transformed))]
-    original_corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(original))
-    transformed_corelation = self._corelation_spearman_on_injection(x_list, self._strip_data(transformed))
+    x_list_original = [i for i in range(len(original))]
+    x_list_transformed = [i for i in range(len(transformed))]
+    original_corelation = self._corelation_spearman_on_injection(x_list_original, self._strip_data(original))
+    transformed_corelation = self._corelation_spearman_on_injection(x_list_transformed, self._strip_data(transformed))
     return self._cacl_score(original_corelation, transformed_corelation)
 
   def compression_ratio_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:

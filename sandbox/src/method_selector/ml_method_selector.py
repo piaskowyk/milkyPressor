@@ -82,6 +82,7 @@ class MlMethodSelector:
     compressor.compress()
     compression_metrics = self.similarity_metrics_container.compute_all(data, compressor.compressed_data)
     stats = compressor.get_stats()
+    compressor.vizualize()
     stats['method_name'] = best_method_name
     return compressor.compressed_data, stats, list(compression_metrics.values())
 
@@ -91,7 +92,7 @@ class MlMethodSelector:
       classic_method_selector = ClassicMethodSelector()
 
       if self.strategy == StrategyEnum.DEFAULT:
-        best_method_name = classic_method_selector.get_best_with_default_strategy(
+        best_method_name, _ = classic_method_selector.get_best_with_default_strategy(
           measurements, 
           self.comparation_metrics,
           self.custom_comparation_metric

@@ -10,6 +10,7 @@ class ClassicMethodSelector:
 
   def __init__(self) -> None:
     self.comparation_metrics_containter = SimilarityMetric()
+    self.similarity_metrics_container = SimilarityMetric()
     self.metrics = None
     self.compressors: Dict[str, Compressor] = CompressorsProvider.get_compressors()
 
@@ -19,17 +20,33 @@ class ClassicMethodSelector:
       for name, value in metrics.items():
         print(f"\t{name}:\t{value}")
 
+  def compress_with_best_default_strategy(
+      self, 
+      data: List[Measurement], 
+      comparation_metrics: List[SimilarityMetricEnum] = None,
+      custom_metrics: List[Callable[[List[Measurement], List[Measurement]], float]] = []
+    ) -> List[Measurement]:
+    best_method_name, metrics_score = self.get_best_with_default_strategy(data, comparation_metrics, custom_metrics)
+    compressor: Compressor = CompressorsProvider.get(best_method_name)
+    compressor.set_data(data)
+    compressor.compress()
+    compressor.vizualize()
+    compression_metrics = self.similarity_metrics_container.compute_all(data, compressor.compressed_data)
+    stats = compressor.get_stats()
+    stats['method_name'] = best_method_name
+    return compressor.compressed_data, stats, list(compression_metrics.values()), metrics_score
+
   def get_best_with_default_strategy(
       self, 
       data: List[Measurement], 
-      comparation_metrics: List[SimilarityMetricEnum],
-      custom_metrics: List[Callable[[List[Measurement], List[Measurement]], float]]
-    ) -> str:
+      comparation_metrics: List[SimilarityMetricEnum] = None,
+      custom_metrics: List[Callable[[List[Measurement], List[Measurement]], float]] = []
+    ) -> Tuple[str, float]:
     method_metrics_result = dict()
     if comparation_metrics != None:
       comparation_metrics_count = len(comparation_metrics)
     else:
-      comparation_metrics = []
+      comparation_metrics = self.comparation_metrics_containter.get_all_metric_list()
       comparation_metrics_count = self.comparation_metrics_containter.get_metrics_count()
     if SimilarityMetricEnum.compression_rate.value not in comparation_metrics:
       comparation_metrics.append(SimilarityMetricEnum.compression_rate)
@@ -38,20 +55,17 @@ class ClassicMethodSelector:
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data
-      if len(compressed_data) == 0:
-        print(name)
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
       for index, custom_metric in enumerate(custom_metrics):
         result[f'custom_{index}'] = custom_metric(data, compressed_data)
-      result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
+      result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.5
       method_metrics_result[name] = result
-
     agregated_metrics = dict()
     for method_name, metrics_value in method_metrics_result.items():
       agregated_metrics[method_name] = sum(metrics_value.values())
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: -item[1])
-    best_method_name, _ = sorted_methods[0]
-    return best_method_name
+    best_method_name, score = sorted_methods[0]
+    return best_method_name, score
 
   def get_best_with_weights_strategy(
       self, 
@@ -122,3 +136,30 @@ class ClassicMethodSelector:
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: (-item[1][0], -item[1][1]))
     best_method_name, _ = sorted_methods[0]
     return best_method_name
+
+  def compute_similarity_with_default_strategy(
+      self,
+      original_data: List[Measurement], 
+      compressed_data: List[Measurement], 
+      comparation_metrics: List[SimilarityMetricEnum] = None,
+      custom_metrics: List[Callable[[List[Measurement], List[Measurement]], float]] = []
+    ) -> float:
+    if comparation_metrics != None:
+      comparation_metrics_count = len(comparation_metrics)
+    else:
+      comparation_metrics = self.comparation_metrics_containter.get_all_metric_list()
+      comparation_metrics_count = self.comparation_metrics_containter.get_metrics_count()
+    if SimilarityMetricEnum.compression_rate.value not in comparation_metrics:
+      comparation_metrics.append(SimilarityMetricEnum.compression_rate)
+    result = self.comparation_metrics_containter.compute_metrics(original_data, compressed_data, comparation_metrics)
+    for index, custom_metric in enumerate(custom_metrics):
+      result[f'custom_{index}'] = custom_metric(original_data, compressed_data)
+    result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
+    score = sum(result.values())
+    return score
+
+  def compute_similarity_with_weights_strategy() -> float:
+    pass
+
+  def compute_similarity_with_constraint_strategy() -> float:
+    pass

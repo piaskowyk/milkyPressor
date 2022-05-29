@@ -24,7 +24,7 @@ class Compressor:
     self.original_data = []
     self.compressed_data = []
 
-  def vizualize(self, show_compressed: bool = True, show_interpolation: bool = False, config: any = {}):
+  def vizualize(self, show_compressed: bool = True, show_interpolation: bool = True, config: any = {}):
     x_original = [measurement.timestamp for measurement in self.original_data]
     y_original = [measurement.value for measurement in self.original_data]
     plt.figure(dpi=100)
