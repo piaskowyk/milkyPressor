@@ -3,3 +3,4 @@ scikit-learn
 sklearn-porter
 fogml
 ipykernel
+pandas

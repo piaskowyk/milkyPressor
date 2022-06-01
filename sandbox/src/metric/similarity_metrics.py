@@ -116,6 +116,8 @@ class SimilarityMetric:
     f_a = (point_b.value - point_a.value) / (point_b.timestamp - point_a.timestamp)
     f_b = (point_b.timestamp * point_a.value - point_a.timestamp * point_b.value) / (point_b.timestamp - point_a.timestamp)
     maximum_diff = sum([math.fabs(original[i].value - (f_a * original[i].timestamp + f_b)) for i in range(len(original))])
+    if maximum_diff == 0:
+      maximum_diff = 1
     score = 1 - transformed_diff / maximum_diff
     return max(score, 0)
   

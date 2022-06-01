@@ -4,6 +4,7 @@ from src.metric.similarity_metrics import SimilarityMetric
 from sklearn import tree
 from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
+import random
 
 from ..data_type import Measurement
 from ..metric import FeatureMetric, SimilarityMetricEnum, FeatureMetricEnum
@@ -55,16 +56,38 @@ class MlMethodSelector:
     self.comparation_metrics = list(constraints.keys())
     self.constraints = constraints
 
+  def split_dataset(self, dataset):
+    dataset_pivot = int(len(dataset) * 0.8)
+    train_dataset = dataset[:dataset_pivot]
+    test_dataset = dataset[dataset_pivot:]
+    X_train = [data for data, _ in train_dataset]
+    y_train = [label for _, label in train_dataset]
+    X_test = [data for data, _ in test_dataset]
+    y_test = [label for _, label in test_dataset]
+    return X_train, y_train, X_test, y_test
+
+  def calc_custom_score(self, X_test, y_test):
+    data_count = len(X_test)
+    success_counter = 0
+    for i in range(data_count):
+      expected_label = y_test[i]
+      predicted_label = self.classifier.predict([X_test[i]])[0]
+      if expected_label.split('_')[0] == predicted_label.split('_')[0]:
+        success_counter += 1
+    return success_counter / data_count
+
   def train(self):
     dataset = self._prepare_dataset()
-    X_train = [data for data, _ in dataset]
-    y_train = [label for _, label in dataset]
-    X_test = [data for data, _ in dataset[:2]]
-    y_test = [label for _, label in dataset[:2]]
+    X_train, y_train, X_test, y_test = self.split_dataset(dataset)
     classifier = tree.DecisionTreeClassifier()
     self.classifier = classifier.fit(X_train, y_train)
-    score = classifier.score(X_test, y_test)
-    return score
+    # from matplotlib import pyplot as plt
+    # plt.figure(figsize=(60,30))  # set plot size (denoted in inches)
+    # tree.plot_tree(classifier, fontsize=10, class_names=True)
+    # plt.show()
+    score_1 = classifier.score(X_test, y_test)
+    score_2 = self.calc_custom_score(X_test, y_test)
+    return score_1, score_2
 
   def get_classifier(self):
     return self.classifier
@@ -82,12 +105,13 @@ class MlMethodSelector:
     compressor.compress()
     compression_metrics = self.similarity_metrics_container.compute_all(data, compressor.compressed_data)
     stats = compressor.get_stats()
-    compressor.vizualize()
+    # compressor.vizualize()
     stats['method_name'] = best_method_name
     return compressor.compressed_data, stats, list(compression_metrics.values())
 
   def _prepare_dataset(self):
     dataset = []
+    random.shuffle(self.measurements_set)
     for measurements in self.measurements_set:
       classic_method_selector = ClassicMethodSelector()
 

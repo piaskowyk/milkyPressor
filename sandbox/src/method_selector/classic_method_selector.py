@@ -30,7 +30,7 @@ class ClassicMethodSelector:
     compressor: Compressor = CompressorsProvider.get(best_method_name)
     compressor.set_data(data)
     compressor.compress()
-    compressor.vizualize()
+    # compressor.vizualize()
     compression_metrics = self.similarity_metrics_container.compute_all(data, compressor.compressed_data)
     stats = compressor.get_stats()
     stats['method_name'] = best_method_name
@@ -58,7 +58,7 @@ class ClassicMethodSelector:
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
       for index, custom_metric in enumerate(custom_metrics):
         result[f'custom_{index}'] = custom_metric(data, compressed_data)
-      result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.5
+      result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
       method_metrics_result[name] = result
     agregated_metrics = dict()
     for method_name, metrics_value in method_metrics_result.items():
