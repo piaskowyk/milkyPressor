@@ -12,7 +12,6 @@ class ClassicMethodSelector:
     self.comparation_metrics_containter = SimilarityMetric()
     self.similarity_metrics_container = SimilarityMetric()
     self.metrics = None
-    self.compressors: Dict[str, Compressor] = CompressorsProvider.get_compressors()
 
   def print_result(self, metric_result) -> None:
     for key, metrics in metric_result.items():
@@ -51,19 +50,24 @@ class ClassicMethodSelector:
     if SimilarityMetricEnum.compression_rate.value not in comparation_metrics:
       comparation_metrics.append(SimilarityMetricEnum.compression_rate)
 
-    for name, compressor in self.compressors.items():
+    for name, compressor in CompressorsProvider.get_compressors().items():
+      data = data[:]
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data
+      if len(data) < len(compressed_data):
+        print(len(data), len(compressed_data), name, compressor)
       result = self.comparation_metrics_containter.compute_metrics(data, compressed_data, comparation_metrics)
       for index, custom_metric in enumerate(custom_metrics):
         result[f'custom_{index}'] = custom_metric(data, compressed_data)
       result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
+      # print(result[SimilarityMetricEnum.compression_rate.value])
       method_metrics_result[name] = result
     agregated_metrics = dict()
     for method_name, metrics_value in method_metrics_result.items():
       agregated_metrics[method_name] = sum(metrics_value.values())
     sorted_methods = sorted(agregated_metrics.items(), key=lambda item: -item[1])
+    # print(sorted_methods)
     best_method_name, score = sorted_methods[0]
     return best_method_name, score
 
@@ -76,7 +80,7 @@ class ClassicMethodSelector:
     method_metrics_result = dict()
     comparation_metrics = list(weights.keys())
 
-    for name, compressor in self.compressors.items():
+    for name, compressor in CompressorsProvider.get_compressors().items():
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data
@@ -106,7 +110,7 @@ class ClassicMethodSelector:
     if SimilarityMetricEnum.compression_rate not in comparation_metrics:
       comparation_metrics.append(SimilarityMetricEnum.compression_rate)
 
-    for name, compressor in self.compressors.items():
+    for name, compressor in CompressorsProvider.get_compressors().items():
       compressor.set_data(data)
       compressor.compress()
       compressed_data = compressor.compressed_data

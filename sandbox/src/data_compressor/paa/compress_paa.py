@@ -14,11 +14,12 @@ class CompressPAA(Compressor):
     }
 
   def compress(self):
+    tmp = len(self.compressed_data)
     data_size = len(self.original_data)
     if data_size < 2:
       self.compressed_data = self.original_data[:]
       return
-    chunk_count = int(data_size * self.config['compress_ratio'])
+    chunk_count = int(data_size * self.config['compress_ratio'] / 2)
     x_first = self.original_data[0].timestamp
     x_last = self.original_data[data_size - 1].timestamp
     chunk_size = (x_last - x_first) / chunk_count
@@ -42,3 +43,7 @@ class CompressPAA(Compressor):
     for i, value in enumerate(series):
       self.compressed_data.append(Measurement(value, x_first + i * chunk_size))
       self.compressed_data.append(Measurement(value, x_first + (i + 1) * chunk_size))
+
+    if len(self.compressed_data) > len(self.original_data):
+      print(tmp, len(self.original_data), len(self.compressed_data), len(series), chunk_count, data_size, self.config['compress_ratio'])
+      # self.vizualize()

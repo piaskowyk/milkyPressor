@@ -28,7 +28,7 @@ class CompressorsProvider:
       ('CompressPIP_VD', CompressPIP_VD),
       ('CompressPAA', CompressPAA),
       ('CompressPAAVI', CompressPAAVI),
-      ('CompressByChunk', CompressPAAVI),
+      ('CompressByChunk', CompressByChunk),
       ('CompressAPCADFT', CompressAPCADFT),
       ('CompressAPCAFFT', CompressAPCAFFT),
     ]
