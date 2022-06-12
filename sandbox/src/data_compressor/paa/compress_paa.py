@@ -20,6 +20,8 @@ class CompressPAA(Compressor):
       self.compressed_data = self.original_data[:]
       return
     chunk_count = int(data_size * self.config['compress_ratio'] / 2)
+    if chunk_count == 0:
+      self.compressed_data = self.original_data[:]
     x_first = self.original_data[0].timestamp
     x_last = self.original_data[data_size - 1].timestamp
     chunk_size = (x_last - x_first) / chunk_count

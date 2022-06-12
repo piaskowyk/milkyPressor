@@ -122,13 +122,13 @@ class MlMethodSelector:
           self.custom_comparation_metric
         )
       elif self.strategy == StrategyEnum.WEIGHTS:
-        best_method_name = classic_method_selector.get_best_with_weights_strategy(
+        best_method_name, _ = classic_method_selector.get_best_with_weights_strategy(
           measurements, 
           self.weights,
           self.custom_comparation_metric_with_weight
         )
       else:
-        best_method_name = classic_method_selector.get_best_with_constraint_strategy(
+        best_method_name, _ = classic_method_selector.get_best_with_constraint_strategy(
           measurements, 
           self.constraints,
           self.custom_comparation_metric_with_constraint
