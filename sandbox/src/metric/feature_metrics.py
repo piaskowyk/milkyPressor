@@ -145,6 +145,7 @@ class FeatureMetric:
       if direction < 0: # negaive crossing
         if lastPosition > 0 and position != lastPosition:
           counter += 1
+      lastPosition = position
 
     return counter
 

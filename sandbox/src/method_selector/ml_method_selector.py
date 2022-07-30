@@ -2,6 +2,7 @@ from typing import Dict, List, Callable, Tuple
 from enum import Enum
 from src.metric.similarity_metrics import SimilarityMetric
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
 from src.data_compressor.compressor import Compressor
 from src.data_compressor.compressors_provider import CompressorsProvider
 import random
@@ -76,10 +77,13 @@ class MlMethodSelector:
         success_counter += 1
     return success_counter / data_count
 
-  def train(self):
+  def train(self, use_random_forest = False):
     dataset = self._prepare_dataset()
     X_train, y_train, X_test, y_test = self.split_dataset(dataset)
-    classifier = tree.DecisionTreeClassifier()
+    if use_random_forest:
+      classifier = RandomForestClassifier()
+    else:
+      classifier = tree.DecisionTreeClassifier()
     self.classifier = classifier.fit(X_train, y_train)
     # from matplotlib import pyplot as plt
     # plt.figure(figsize=(60,30))  # set plot size (denoted in inches)

@@ -41,7 +41,6 @@ class ClassicMethodSelector:
       comparation_metrics_count = self.comparation_metrics_containter.get_metrics_count()
     comparation_metrics_count += len(custom_metrics if custom_metrics != None else [])
     max_score = comparation_metrics_count + comparation_metrics_count * 0.2
-
     return compressor.compressed_data, stats, list(compression_metrics.values()), round(metrics_score / max_score * 100, 4)
 
   def get_best_with_default_strategy(
@@ -205,9 +204,7 @@ class ClassicMethodSelector:
       result[f'custom_{index}'] = custom_metric(original_data, compressed_data)
     result[SimilarityMetricEnum.compression_rate.value] *= 1 + comparation_metrics_count * 0.2
     score = sum(result.values())
-
     max_score = comparation_metrics_count + comparation_metrics_count * 0.2
-
     return round(score / max_score * 100, 4)
 
   def compute_similarity_with_weights_strategy(

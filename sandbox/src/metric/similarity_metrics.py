@@ -99,10 +99,19 @@ class SimilarityMetric:
   
   def _cacl_score(self, original_value: float, transformed_value: float) -> float:
     if original_value == 0:
-      return 1
-    score = 1 - abs((original_value - transformed_value) / original_value)
-    # if score > 1 or score < 0:
-    #   raise Exception(f"score problem: {score}, {original_value}, {transformed_value}")
+      original_value = 1
+    if transformed_value == 0:
+      transformed_value = 1
+    original_value = abs(original_value)
+    transformed_value = abs(transformed_value)
+    max_value = original_value
+    if transformed_value > max_value:
+      max_value = transformed_value
+    original_value = original_value / max_value
+    transformed_value = transformed_value / max_value
+    score = 1 - abs((original_value - transformed_value))
+    if score > 1 or score < 0:
+      raise Exception(f"score problem: {score}, {original_value}, {transformed_value}")
     return max(0, score)
 
   def sum_differences_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
@@ -147,7 +156,7 @@ class SimilarityMetric:
       h = data[i - 1].timestamp - data[i].timestamp
       a = data[i - 1].value
       b = data[i].value
-      field += (a + b) * h / 2
+      field += abs((a + b) * h / 2)
     return field
 
   def function_field_score(self, original: List[Measurement], transformed: List[float]) -> float:
@@ -206,6 +215,7 @@ class SimilarityMetric:
       if direction < 0: # negaive crossing
         if lastPosition > 0 and position != lastPosition:
           counter += 1
+      lastPosition = position
 
     return counter
 
@@ -298,8 +308,16 @@ class SimilarityMetric:
     return self._cacl_score(original_peaks_count, transformed_peaks_count)
 
   def median_score(self, original: List[Measurement], transformed: List[Measurement]) -> float:
-    original_median = statistics.median(self._strip_data(original))
-    transformed_median = statistics.median(self._strip_data(transformed))
+    striped_original = self._strip_data(original)
+    striped_transformed = self._strip_data(transformed)
+    mean = statistics.mean(striped_original)
+    if abs(mean) < 1 :
+      if mean == 0:
+        mean = 1
+      striped_original = [i + 1 - mean * 2 for i in striped_original]
+      striped_transformed = [i + 1 - mean * 2 for i in striped_transformed]
+    original_median = statistics.median(striped_original)
+    transformed_median = statistics.median(striped_transformed)
     return self._cacl_score(original_median, transformed_median)
   
   def fft(self, transformed: List[float], show_plot: bool = False) -> Tuple[List[float], Any]:
