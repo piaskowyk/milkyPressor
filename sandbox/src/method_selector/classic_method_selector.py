@@ -252,12 +252,15 @@ class ClassicMethodSelector:
         pass_limits = False
         break
     
+    if len(original_data) == len(compressed_data):
+      pass_limits = True
+
     if comparation_metrics != None:
       comparation_metrics_count = len(comparation_metrics)
     else:
       comparation_metrics_count = self.comparation_metrics_containter.get_metrics_count()
     comparation_metrics_count += len(custom_metrics)
     score = sum(result.values())
-    max_score = comparation_metrics_count + comparation_metrics_count * 0.2
+    max_score = comparation_metrics_count
 
     return round(score / max_score * 100, 4) if pass_limits else 100
